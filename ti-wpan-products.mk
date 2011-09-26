@@ -3,4 +3,5 @@
 
 PRODUCT_PACKAGES += uim-sysfs \
 	TIInit_10.6.15.bts \
-	TIInit_10.4.27.bts
+	TIInit_10.4.27.bts \
+	bt_sco_app
