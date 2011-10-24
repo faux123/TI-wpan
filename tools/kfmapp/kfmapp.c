@@ -835,6 +835,7 @@ int fmapp_start_audio()
    config.period_count = 4;
    config.format = PCM_FORMAT_S16_LE;
    config.silence_threshold = 0;
+   config.stop_threshold = -1;
 
    if (fm_aud_enable == 0){
        /* Set Tinymix controles */
