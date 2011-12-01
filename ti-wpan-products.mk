@@ -10,4 +10,6 @@ PRODUCT_PACKAGES += uim-sysfs \
         FmRxApp \
         FmTxApp \
         FmService \
-        libfmradio
+        libfmradio \
+        fmradioif \
+        com.ti.fm.fmradioif.xml
