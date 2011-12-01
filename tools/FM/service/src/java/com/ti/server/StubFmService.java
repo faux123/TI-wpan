@@ -4992,12 +4992,13 @@ public class StubFmService extends IFmRadio.Stub implements
              int off =0;
               /* L27 Specific */
              enableRx(off);
-
-             /* L25 Specific */
-        //mAudioManager.setParameters(AUDIO_RX_ENABLE+"=false");
-//TODO Ram-            mAudioManager.setSpeakerphoneOnForFm(false);
-
-            Log.d(TAG, "FM RX powered on mRxState " + mRxState);
+	     /* Release the wake lock
+	      * so that device can go into
+	      * OFF mode
+	      */
+	     if ((mWakeLock != null) && (mWakeLock.isHeld()))
+		     mWakeLock.release();
+	     Log.d(TAG, "FM RX powered on mRxState " + mRxState);
         Log.d(TAG, "StubFmService:sending intent FM_DISABLED_ACTION");
 
         cancelNotification(FM_RX_NOTIFICATION_ID);
@@ -7088,13 +7089,20 @@ public class StubFmService extends IFmRadio.Stub implements
          * Tell the Audio Hardware interface that FM is enabled, so that routing
          * happens appropriately
          */
-           /* L25 Specific */
-        //mAudioManager.setParameters(AUDIO_RX_ENABLE+"=true");
-           /* L27 Specific */
          int on = 1;
          enableRx(on);
-
-
+         /*
+          * Previously when FM playback use to happen the wake lock was present in kernel
+          * which used to prevent device into suspend. And FM playback used to work
+          * Now, the wake lock has been removed and the FM service will not control
+          * by acquiring wake lock and releasing once FM is off
+          */
+	 if (mWakeLock != null) {
+		 if (!mWakeLock.isHeld()) {
+			 mWakeLock.acquire();
+		 } else
+			 Log.e(TAG," Wake lock is already held");
+	 }
     }
 
         private  void enableIntent(JFmRxStatus status) {
