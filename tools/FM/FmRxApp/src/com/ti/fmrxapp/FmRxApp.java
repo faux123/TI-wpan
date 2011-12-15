@@ -1926,9 +1926,9 @@ if (MAKE_FM_APIS_BLOCKING == true) {
             Log.d(TAG, " imgMute mToggleMute " + mToggleMute );
             int muteValue =0;
             if(mToggleMute ==true)
-            muteValue =0 ;
+            muteValue =1 ;
             else
-            muteValue =1;
+            muteValue =0;
 
             if (MAKE_FM_APIS_BLOCKING == true) {
                       // Code for blocking call
