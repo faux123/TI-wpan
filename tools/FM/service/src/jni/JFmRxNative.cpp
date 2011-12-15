@@ -592,7 +592,7 @@ static int nativeJFmRx_SetMuteMode(JNIEnv *env, jobject obj,jlong jContextValue,
     V4L2_JBTL_LOGD("nativeJFmRx_setMuteMode(): Entered");
 
    vctrl.id = V4L2_CID_AUDIO_MUTE;
-   vctrl.value = jFmMuteMode;
+   vctrl.value = !jFmMuteMode; /* To Do:: Mapping in future for V4L2*/
    status = ioctl(radio_fd,VIDIOC_S_CTRL,&vctrl);
    if(status < 0)
    {
