@@ -697,7 +697,7 @@ static {
     }
 
     public JFmTxStatus txEnableRds() {
-       JFmLog.d(TAG, "txSetPowerLevel: entered");
+       JFmLog.d(TAG, "txEnableRds: entered");
 
        JFmTxStatus jFmTxStatus;
 

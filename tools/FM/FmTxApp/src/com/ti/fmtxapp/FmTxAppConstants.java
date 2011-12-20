@@ -125,8 +125,8 @@ public interface FmTxAppConstants {
     public static final int DEFAULT_REPERTOIRE = 0;
     public static final int DEFAULT_DISPLAYMODE = 0;
     public static final int DEFAULT_MONOSTEREO = 1;
-    public static final String DEF_PS_STRING = "Test";
-    public static final String DEF_RT_STRING = "RT";
+    public static final String DEF_PS_STRING = "TI Radio PS";
+    public static final String DEF_RT_STRING = "TI Radio RT";
     public static final String DEF_PTY_STRING = "0";
     public static final String DEF_ECC_STRING = "0";
     public static final int DEFAULT_AFCODE = 224;

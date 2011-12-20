@@ -147,10 +147,13 @@ typedef FMC_UINT FmTxCmdType;
 #define FM_TX_CMD_COMPLETE_SCAN_PROGRESS                            	((FmTxCmdType)42)
 #define FM_TX_CMD_STOP_COMPLETE_SCAN                            	((FmTxCmdType)43)
 #define FM_TX_CMD_START_TRANSMISSION                            	((FmTxCmdType)44)
-#define FM_TX_CMD_STOP_TRANSMISSION                            	((FmTxCmdType)45)
+#define FM_TX_CMD_STOP_TRANSMISSION                            		((FmTxCmdType)45)
 #define FM_TX_CMD_SET_RDS_TEXT_RT_MSG                            	((FmTxCmdType)46)
 #define FM_TX_CMD_SET_RDS_TEXT_PS_MSG                            	((FmTxCmdType)47)
-#define FM_TX_LAST_API_CMD						(FM_TX_CMD_SET_RDS_TEXT_PS_MSG)
+#define FM_TX_CMD_SET_RDS_PTY_CODE					((FmTxCmdType)48)
+#define FM_TX_CMD_GET_RDS_PTY_CODE					((FmTxCmdType)49)
+
+#define FM_TX_LAST_API_CMD						(FM_TX_CMD_GET_RDS_PTY_CODE)
 #define FM_TX_CMD_NONE					0xFFFFFFFF
 
 

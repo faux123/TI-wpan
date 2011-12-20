@@ -6101,6 +6101,7 @@ public class StubFmService extends IFmRadio.Stub implements
             mTxState = STATE_ENABLED;
 
 
+	sendNotificationTX();
         /* Ne need to call again, let it take from default */
 
         //if(status ==JFmTxStatus.SUCCESS )

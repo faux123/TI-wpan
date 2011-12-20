@@ -52,7 +52,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
     ********************************************/
     private Button btnCancel,btnOk;
     private Spinner spnMonoStereo/*spnEcc,spnRepetoire,spnTxMode,spnDisplayMode*/;
-    private EditText txtPsStr,textPower;/*edtPiCode,edtAfCode;    */
+    private EditText txtPsStr,textPower,edtPiCode;/*edtAfCode;    */
     private EditText edtRadioText,edtPty;
     private CheckBox rbtnPs,rbtnRt;
 /*    private CheckBox chbRdsMode;
@@ -114,7 +114,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
        txtPsStr = (EditText)findViewById(R.id.EdtPSString);
     textPower = (EditText)findViewById(R.id.powLevel);
 
-    //edtPiCode = (EditText)findViewById(R.id.piCode);
+    edtPiCode = (EditText)findViewById(R.id.piCode);
     //edtAfCode = (EditText)findViewById(R.id.afCode);
     //rbtnTp=(RadioButton)findViewById(R.id.rbtnTp);
     //rbtnTp.setOnCheckedChangeListener(this);
@@ -297,15 +297,15 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
        int action = keyEvent.getAction();
 
        if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) {
-          Log.v(TAG, "KEYCODE_SOFT_RIGHT " );
+           Log.v(TAG, "KEYCODE_SOFT_RIGHT " );
            finish();
           return true;
        }
 
        if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) {
             Log.v(TAG, "KEYCODE_SOFT_LEFT " );
-        savePrefernces();
-             //finish();
+            savePrefernces();
+            //finish();
             return true;
          }
 
@@ -368,7 +368,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
 
         edtRadioText.setText(fmConfigPreferences.getString(RT_STRING,DEF_RT_STRING));
         edtPty.setText(fmConfigPreferences.getString(PTY_STRING,DEF_PTY_STRING));
-
+        edtPiCode.setText(fmConfigPreferences.getString(PICODE_STRING,DEFAULT_PICODE_STRING));
 
            rbtnPs.setChecked(fmConfigPreferences.getBoolean(PSENABLED,false));
            rbtnRt.setChecked(fmConfigPreferences.getBoolean(RTENABLED,false));
@@ -379,8 +379,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
         textPower.setText(fmConfigPreferences.getString(POWER_STRING,DEF_POWER_STRING));
         txtPsStr.setText(fmConfigPreferences.getString(PS_STRING,DEF_PS_STRING));
         Log.i(TAG,"updateUiFromPreference() --> PS_STRING = "+txtPsStr.getText().toString());
-        /*edtPiCode.setText(fmConfigPreferences.getString(PICODE_STRING,DEFAULT_PICODE_STRING));
-        edtAfCode.setText(fmConfigPreferences.getString(AFCODE_STRING,DEFAULT_AFCODE_STRING));
+        /*edtAfCode.setText(fmConfigPreferences.getString(AFCODE_STRING,DEFAULT_AFCODE_STRING));
 
         spnDisplayMode.setSelection(fmConfigPreferences.getInt(DISPLAY_MODE, DEFAULT_DISPLAYMODE));
         spnTxMode.setSelection(fmConfigPreferences.getInt(TX_MODE, DEFAULT_TXMODE));
@@ -410,7 +409,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
         SharedPreferences.Editor editor = fmConfigPreferences.edit();
 
 
-       /*     editor.putInt(DISPLAY_MODE, spnDisplayMode.getSelectedItemPosition());
+       /*editor.putInt(DISPLAY_MODE, spnDisplayMode.getSelectedItemPosition());
         editor.putInt(TX_MODE, spnTxMode.getSelectedItemPosition());
         editor.putInt(REPERTOIRE, spnRepetoire.getSelectedItemPosition());*/
         editor.putInt(MONO_STEREO, spnMonoStereo.getSelectedItemPosition());
@@ -419,6 +418,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
         editor.putString(PS_STRING, txtPsStr.getText().toString());
         editor.putString(RT_STRING, edtRadioText.getText().toString());
         editor.putString(PTY_STRING, edtPty.getText().toString());
+        editor.putString(PICODE_STRING, edtPiCode.getText().toString());
         editor.putBoolean(PSENABLED,rbtnPs.isChecked());
         editor.putBoolean(RTENABLED,rbtnRt.isChecked());
 
@@ -429,9 +429,8 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
         savePowerLevel();
         savePtyCode();
         sendAdvanceConfigIntent();
-    /*    saveAfCode();
-        savePiCode();*/
-
+        savePiCode();
+    /*    saveAfCode(); */
     }
 
     /** Checks the Power value for validity */
@@ -606,30 +605,31 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
     savePiCode()
 
 *********************************************************************/
-/*    private void savePiCode()
+    private void savePiCode()
     {
 
         fmConfigPreferences = getSharedPreferences("fmConfigPreferences",MODE_PRIVATE);
 
         SharedPreferences.Editor editor = fmConfigPreferences.edit();
 
-    Log.i(TAG,"savePiCode()");
+            Log.i(TAG,"savePiCode()");
+
          try{
              int piCodeValue = Integer.parseInt(edtPiCode.getText().toString());
-          boolean valid = piCodeValid(piCodeValue);
-            if(valid || (edtPiCode.getText().toString()== null))
-            {
+             boolean valid = piCodeValid(piCodeValue);
+             if(valid || (edtPiCode.getText().toString()== null))
+             {
                 editor.putString(PICODE_STRING, edtPiCode.getText().toString());
                 if(edtPiCode.getText().toString()== null)
                 editor.putInt(PI_CODE, DEFAULT_PICODE);
-            else
-            {
+             else
+             {
                 editor.putInt(PI_CODE, piCodeValue);
-            }
+             }
                 editor.commit();
-            sendRdsIntent();
-            }
-            else
+                sendRdsIntent();
+             }
+             else
         {
            new AlertDialog.Builder(this)
            .setIcon(android.R.drawable.ic_dialog_alert)
@@ -650,7 +650,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
              edtPiCode.setText(null);
               }
 
-    }*/
+    }
 
 
     /** Checks the Power value for validity */

@@ -608,7 +608,7 @@ private void setRdsConfig()
 
 
         // Set Pi Code
-        /*int piCode = fmConfigPreferences.getInt(PI_CODE,DEFAULT_PICODE);
+        int piCode = fmConfigPreferences.getInt(PI_CODE,DEFAULT_PICODE);
         Log.i(TAG,"setRdsConfig-- >piCode =" +    piCode );
 
         if (mPiCode != piCode) {
@@ -623,7 +623,8 @@ private void setRdsConfig()
         }
 
 
-        // Set Af Code
+        // Set Af Codei
+	/*
         int afCode = fmConfigPreferences.getInt(AF_CODE,DEFAULT_AFCODE);
         Log.i(TAG,"setRdsConfig-- >afCode = "+afCode);
         if (mAfCode != afCode) {

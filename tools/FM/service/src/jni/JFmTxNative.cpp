@@ -684,18 +684,62 @@ return 0;
 
 static int nativeJFmTx_SetRdsPtyCode(JNIEnv *env, jobject obj, jlong jContextValue,jint ptyCode)
 {
-return 0;
+	int user_val;
+	int res;
+	struct v4l2_ext_controls_kfmapp vec;
+	struct v4l2_ext_control_kfmapp vctrls;
+
+	LOGE("nativeJFmTx_SetRdsPtyCode(): Entered");
+
+	vec.ctrl_class = V4L2_CTRL_CLASS_FM_TX;
+	vec.count = 1;
+	vctrls.id = V4L2_CID_RDS_TX_PTY;
+	vctrls.value = ptyCode;
+	vctrls.size = 0;
+	vec.controls = &vctrls;
+
+	res = ioctl(radio_fd, VIDIOC_S_EXT_CTRLS, &vec);
+	if(res < 0)
+	{
+		LOGE("Failed to set FM Tx RDS PTY\n");
+		return res;
+	}
+
+	LOGE("nativeJFmTx_SetRdsPtyCode(): Exit");
+
+	return res;
 }
 
 static int nativeJFmTx_GetRdsPtyCode(JNIEnv *env, jobject obj, jlong jContextValue,jint ptyCode)
 {
-return 0;
+	return 0;
 }
-
 
 static int nativeJFmTx_SetRdsPiCode(JNIEnv *env, jobject obj, jlong jContextValue,jint piCode)
 {
-return 0;
+	struct v4l2_ext_controls_kfmapp vec;
+	struct v4l2_ext_control_kfmapp vctrls;
+	int res;
+
+	LOGD("nativeJFmTx_SetRdsPiCode(): Enter");
+
+	vec.ctrl_class = V4L2_CTRL_CLASS_FM_TX;
+	vec.count = 1;
+	vctrls.id = V4L2_CID_RDS_TX_PI;
+	vctrls.value = piCode;
+	vctrls.size = 0;
+	vec.controls = &vctrls;
+
+	res = ioctl(radio_fd, VIDIOC_S_EXT_CTRLS, &vec);
+	if(res < 0)
+	{
+		LOGE("Failed to set FM Tx RDS PI Code\n");
+		return res;
+	}
+
+	LOGD("Setting FM Tx RDS PI Code is Succesful\n");
+
+	return res;
 }
 
 static int nativeJFmTx_GetRdsPiCode(JNIEnv *env, jobject obj, jlong jContextValue)
@@ -725,7 +769,29 @@ return 0;
 
 static int nativeJFmTx_SetPowerLevel(JNIEnv *env, jobject obj, jlong jContextValue,jint powerLevel)
 {
-return 0;
+	struct v4l2_ext_controls_kfmapp vec;
+	struct v4l2_ext_control_kfmapp vctrls;
+	int res;
+
+	LOGD("nativeJFmTx_SetPowerLevel(): Enter and power level = %d\n",powerLevel);
+
+	vec.ctrl_class = V4L2_CTRL_CLASS_FM_TX;
+	vec.count = 1;
+	vctrls.id = V4L2_CID_TUNE_POWER_LEVEL;
+	vctrls.value = 122 - powerLevel;
+	vctrls.size = 0;
+	vec.controls = &vctrls;
+
+	res = ioctl(radio_fd, VIDIOC_S_EXT_CTRLS, &vec);
+	if(res < 0)
+	{
+		LOGE("Failed to set FM Tx power level\n");
+		return res;
+	}
+
+	LOGE("Setting FM Tx Power level to ---> %d\n", 122 - vctrls.value);
+
+	return res;
 }
 
 static int nativeJFmTx_GetPowerLevel(JNIEnv *env, jobject obj, jlong jContextValue)
@@ -932,24 +998,31 @@ return 0;
         case FM_TX_CMD_SET_RDS_TEXT_RT_MSG:
             V4L2_JBTL_LOGI("FM_TX_CMD_SET_RDS_TEXT_RT_MSG:Status: %d ",status);
 
-        V4L2_JBTL_LOGI("FM_TX_CMD_DISABLE_RDS:Status: %d ",status);
-        env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdSetRdsTextRtMsg,
-                (jlong)context,
-                (jint)status,
-                (jint)value);
+	    env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdSetRdsTextRtMsg,
+			    (jlong)context,
+			    (jint)status,
+			    (jint)value);
 
         break;
 
         case FM_TX_CMD_SET_RDS_TEXT_PS_MSG:
-    V4L2_JBTL_LOGI("FM_TX_CMD_SET_RDS_TEXT_PS_MSG:Status: %d ",status);
+	V4L2_JBTL_LOGI("FM_TX_CMD_SET_RDS_TEXT_PS_MSG:Status: %d ",status);
 
-    V4L2_JBTL_LOGI("FM_TX_CMD_DISABLE_RDS:Status: %d ",status);
-    env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdSetRdsTextPsMsg,
-            (jlong)context,
-            (jint)status,
-            (jint)value);
+	env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdSetRdsTextPsMsg,
+			(jlong)context,
+			(jint)status,
+			(jint)value);
 
-    break;
+	break;
+
+        case FM_TX_CMD_SET_RDS_PTY_CODE:
+            V4L2_JBTL_LOGI("FM_TX_CMD_SET_RDS_PI_CODE:Status: %d ",status);
+            env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdSetRdsPtyCode,
+                                      (jlong)context,
+                                      (jint)status,
+                                      (jint)value);
+            break;
+
 /*
         case FM_TX_CMD_SET_RDS_TRANSMISSION_MODE:
             V4L2_JBTL_LOGI("FM_TX_CMD_SET_RDS_TRANSMISSION_MODE:Status: %d ",status);
@@ -994,14 +1067,6 @@ return 0;
         case FM_TX_CMD_GET_RDS_PI_CODE:
             V4L2_JBTL_LOGI("FM_TX_CMD_GET_RDS_PI_CODE:Status: %d,Value: %d ",status,value);
             env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdGetRdsPiCode,
-                                      (jlong)context,
-                                      (jint)status,
-                                      (jint)value);
-            break;
-
-        case FM_TX_CMD_SET_RDS_PTY_CODE:
-            V4L2_JBTL_LOGI("FM_TX_CMD_SET_RDS_PI_CODE:Status: %d ",status);
-            env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdSetRdsPtyCode,
                                       (jlong)context,
                                       (jint)status,
                                       (jint)value);

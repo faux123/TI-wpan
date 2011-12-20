@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	 android:id="@+id/ParentLayout"
-	android:orientation="vertical" android:background="@drawable/wallpaper11">
+	android:orientation="vertical" android:background="@drawable/wallpaper_fmtx">
 
 	<ScrollView android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:id="@+id/scrollview1"
@@ -16,7 +16,7 @@
 				android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
 				android:layout_width="fill_parent" android:layout_height="120dip">
 				<ImageView android:id="@+id/imgFTP" android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:layout_marginLeft="30dip" android:src="@drawable/txradio">
+					android:layout_marginLeft="30dip" android:src="@drawable/txradio_ics">
 				</ImageView>
 				<TextView android:id="@+id/lblFmRx" android:layout_width="fill_parent"
 					android:layout_height="30dip" android:layout_marginTop="15dip"

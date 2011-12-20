@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_tx">FM TX App</string>
-<string name="txtplatform">V4L2 based solution for Android</string>
+<string name="app_tx">FM Transmitter Application</string>
+<string name="txtplatform"> TI\'s V4L2 based FM solution for Android</string>
 <string name="lblversion">Version:</string>
 <string name="txtversion">0.1</string>
 <string name="app_txhelp">Help</string>
     <string name="Fm_Tx">FM Transmitter</string>
-    <string name="app_name">FM TX</string>
+    <string name="app_name">TI\'s FM Radio Transmitter</string>
     <string name="btnOptions">Options</string>
     <string name="btnExit">Exit</string>
     <string name="on">ON</string>
@@ -49,7 +49,7 @@
 <string name="empty"></string>
 <string name="pty">Dynamic PTY</string>
 <string name="comp">Compression</string>
-<string name="picode">Pi Code:</string>
+<string name="picode">PI Code:</string>
 <string name="speed">Speed:</string>
 <string name="size">Size:</string>
 <string name="rdsmode">RDS Raw Mode</string>
@@ -78,7 +78,7 @@
 <string name="ta">TA</string>
 <string name="ecc">ECC</string>
 <string name="wrireRAWdata">Wrire RAW data</string>
-<string name="startTx">Start Tx</string>
+<string name="startTx">Start Transmitting</string>
 <string name="afcode">Af Code</string>
 <string name="advancedConfig">Advanced Congif</string>
 <string name="psString">PS String</string>
