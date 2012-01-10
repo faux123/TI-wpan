@@ -86,6 +86,7 @@ void fmapp_display_tx_menu(void)
    printf("2 to set RDS Radio PS Name\n");
    printf("3 <value> to set RDS Radio PI code\n");
    printf("4 <value> to set RDS Radio PTY\n");
+   printf("5 <AF Freq in KHz> to set RDS Radio Alternate Frequency\n");
 }
 void fmapp_display_rx_menu(void)
 {
@@ -316,6 +317,28 @@ int fmapp_set_tx_rds_radio_pi_code(char *cmd)
 
 }
 
+int fmapp_set_tx_rds_radio_af(char *cmd)
+{
+    int fd, res, af_freq;
+
+    fd = open(FMTX_RDS_AF_SYSFS_ENTRY, O_RDWR);
+    if (fd < 0) {
+        printf("Can't open %s", FMTX_RDS_AF_SYSFS_ENTRY);
+        return -1;
+    }
+
+    res = write(fd, cmd, FMAPP_AF_MAX_FREQ_RANGE);
+    if(res <= 0){
+        printf("Failed to set FM TX RDS Alternate Frequency\n");
+        goto exit;
+    }
+
+    printf("FM RDS Alternate Frequency is to %s Succesfully\n", cmd);
+exit:
+    close(fd);
+    return res;
+
+}
 int fmapp_set_tx_rds_radio_pty(char *cmd)
 {
         struct v4l2_ext_controls_kfmapp vec;
@@ -662,9 +685,9 @@ int fmapp_set_rx_af_switch(char *cmd)
 {
     int fd, res;
 
-    fd = open(FM_RDS_AF_SYSFS_ENTRY, O_RDWR);
+    fd = open(FMRX_RDS_AF_SYSFS_ENTRY, O_RDWR);
     if (fd < 0) {
-        printf("Can't open %s", FM_RDS_AF_SYSFS_ENTRY);
+        printf("Can't open %s", FMRX_RDS_AF_SYSFS_ENTRY);
         return -1;
     }
 
@@ -686,16 +709,16 @@ int fmapp_get_rx_af_switch(void)
     unsigned char fm_rds_af;
     int fd, res;
 
-    fd = open(FM_RDS_AF_SYSFS_ENTRY, O_RDONLY);
+    fd = open(FMRX_RDS_AF_SYSFS_ENTRY, O_RDONLY);
     if (fd < 0) {
-        printf("Can't open %s", FM_RDS_AF_SYSFS_ENTRY);
+        printf("Can't open %s", FMRX_RDS_AF_SYSFS_ENTRY);
         return -1;
     }
 
     res = read(fd, &fm_rds_af, 1);
     if(res < 0){
         printf("reading %s failed %s\n",
-                FM_RDS_AF_SYSFS_ENTRY,strerror(res));
+                FMRX_RDS_AF_SYSFS_ENTRY,strerror(res));
         goto exit;
     }
 
@@ -711,16 +734,16 @@ int fmapp_get_rx_rssi_threshold(void)
     unsigned char fm_rssi_threshhold;
     int fd, res;
 
-    fd = open(FM_RSSI_LVL_SYSFS_ENTRY, O_RDONLY);
+    fd = open(FMRX_RSSI_LVL_SYSFS_ENTRY, O_RDONLY);
     if (fd < 0) {
-        printf("Can't open %s", FM_RSSI_LVL_SYSFS_ENTRY);
+        printf("Can't open %s", FMRX_RSSI_LVL_SYSFS_ENTRY);
         return -1;
     }
 
     res = read(fd, &fm_rssi_threshhold, 3);
     if(res < 0){
         printf("reading %s failed %s\n",
-                FM_RSSI_LVL_SYSFS_ENTRY,strerror(res));
+                FMRX_RSSI_LVL_SYSFS_ENTRY,strerror(res));
         goto exit;
     }
 
@@ -736,9 +759,9 @@ int fmapp_set_rx_rssi_threshold(char *cmd)
 {
     int fd, res;
 
-    fd = open(FM_RSSI_LVL_SYSFS_ENTRY, O_RDWR);
+    fd = open(FMRX_RSSI_LVL_SYSFS_ENTRY, O_RDWR);
     if (fd < 0) {
-        printf("Can't open %s", FM_RSSI_LVL_SYSFS_ENTRY);
+        printf("Can't open %s", FMRX_RSSI_LVL_SYSFS_ENTRY);
         return -1;
     }
 
@@ -759,9 +782,9 @@ int fmapp_set_band(char *cmd)
 {
     int fd, res;
 
-    fd = open(FM_BAND_SYSFS_ENTRY, O_RDWR);
+    fd = open(FMRX_BAND_SYSFS_ENTRY, O_RDWR);
     if (fd < 0) {
-        printf("Can't open %s", FM_BAND_SYSFS_ENTRY);
+        printf("Can't open %s", FMRX_BAND_SYSFS_ENTRY);
         return -1;
     }
 
@@ -782,15 +805,15 @@ int fmapp_get_band(void)
     unsigned char fm_band;
     int fd, res;
 
-    fd = open(FM_BAND_SYSFS_ENTRY, O_RDONLY);
+    fd = open(FMRX_BAND_SYSFS_ENTRY, O_RDONLY);
     if (fd < 0) {
-        printf("Can't open %s", FM_BAND_SYSFS_ENTRY);
+        printf("Can't open %s", FMRX_BAND_SYSFS_ENTRY);
         return -1;
     }
 
     res = read(fd, &fm_band, 1);
     if(res < 0){
-        printf("reading %s failed %s\n",FM_BAND_SYSFS_ENTRY,strerror(res));
+        printf("reading %s failed %s\n",FMRX_BAND_SYSFS_ENTRY,strerror(res));
         goto exit;
     }
 
@@ -1383,6 +1406,9 @@ void fmapp_execute_tx_other_command(char *cmd)
             break;
         case '4':
             fmapp_set_tx_rds_radio_pty(cmd+1);
+            break;
+        case '5':
+            fmapp_set_tx_rds_radio_af(cmd+1);
             break;
         case 'h':
             fmapp_display_tx_menu();

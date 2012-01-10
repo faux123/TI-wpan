@@ -22,9 +22,13 @@
 #define _KFMAPP_H
 
 #define DEFAULT_RADIO_DEVICE    "/dev/radio0"
-#define FM_BAND_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fm_band"
-#define FM_RDS_AF_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fm_rds_af"
-#define FM_RSSI_LVL_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fm_rssi_lvl"
+
+#define FMRX_BAND_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_band"
+#define FMRX_RDS_AF_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_rds_af"
+#define FMRX_RSSI_LVL_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_rssi_lvl"
+
+#define FMTX_RDS_AF_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmtx_rds_af"
+
 #define CTL_INDEX_0                0
 #define CTL_INDEX_1                1
 
@@ -76,6 +80,8 @@
 /* Auto scan info */
 #define  FMAPP_ASCAN_SIGNAL_THRESHOLD_PER  50 /* 50 % */
 #define  FMAPP_ASCAN_NO_OF_SIGNAL_SAMPLE   3  /* 3 Samples */
+
+#define  FMAPP_AF_MAX_FREQ_RANGE	6
 
 #define V4L2_CID_CHANNEL_SPACING (V4L2_CID_PRIVATE_BASE + 0)
 
