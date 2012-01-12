@@ -32,9 +32,9 @@ extern "C" {
 
 #define DEFAULT_RADIO_DEVICE    "/dev/radio0"
 #define DEFAULT_FM_ALSA_CARD    "hw:CARD=0"
-#define FM_BAND_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fm_band"
-#define FM_RDS_AF_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fm_rds_af"
-#define FM_RSSI_LVL_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fm_rssi_lvl"
+#define FM_BAND_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_band"
+#define FM_RDS_AF_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_rds_af"
+#define FM_RSSI_LVL_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_rssi_lvl"
 
 #define CTL_INDEX_0                0
 

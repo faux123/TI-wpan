@@ -90,7 +90,7 @@
 <string name="scrollSpeed">Scroll Speed</string>
 <string name="ptyCode">PTY Code</string>
 <string name="radioText">RadioText</string>
-<string name="afCode">AF Code</string>
+<string name="afCode">Alternate Frequency</string>
 <string name="txtRdsConfig">RDS Configuration:</string>
 <string name="txtTXConfig">TX Configuration:</string>
 
