@@ -21,6 +21,8 @@
 #include "v4l2_JbtlLog.h"
 #include "JFmTxNative.h"
 
+#include <stdlib.h>
+
 #define LOG_TAG "JFmTxNative"
 #include <cutils/properties.h>
 
@@ -748,12 +750,35 @@ return 0;
 }
 static int nativeJFmTx_SetRdsAfCode(JNIEnv *env, jobject obj, jlong jContextValue,jint afCode)
 {
-return 0;
+    int fd, res;
+    char str[10];
+
+    sprintf(str, "%d", afCode);
+
+    LOGD("nativeJFmTx_SetRdsAfCode(): Enter");
+
+    fd = open(FMTX_RDS_AF_SYSFS_ENTRY, O_RDWR);
+    if (fd < 0) {
+        LOGD("Can't open %s", FMTX_RDS_AF_SYSFS_ENTRY);
+        return -1;
+    }
+
+    /* Need max 6 cahrs to set AF between 75000 KHz to 108000 KHz */
+    res = write(fd, str, 6);
+    if(res <= 0) {
+        LOGD("Failed to set FM TX RDS AF Frequency\n");
+        goto exit;
+    }
+
+    LOGD("FM RDS Alternate Frequency Set is succesfull\n");
+exit:
+    close(fd);
+    return res;
 }
 
 static int nativeJFmTx_GetRdsAfCode(JNIEnv *env, jobject obj, jlong jContextValue)
 {
-return 0;
+    return 0;
 }
 
 static int nativeJFmTx_SetMonoStereoMode(JNIEnv *env, jobject obj, jlong jContextValue,jint monoStereoMode)
@@ -1039,7 +1064,7 @@ return 0;
                                      (jint)status,
                                      (jint)value);
             break;
-
+*/
         case FM_TX_CMD_SET_RDS_AF_CODE:
             V4L2_JBTL_LOGI("FM_TX_CMD_SET_RDS_AF_CODE:Status: %d ",status);
             env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdSetRdsAfCode,
@@ -1047,7 +1072,7 @@ return 0;
                                       (jint)status,
                                       (jint)value);
             break;
-
+/*
         case FM_TX_CMD_GET_RDS_AF_CODE:
             V4L2_JBTL_LOGI("FM_TX_CMD_GET_POWER_LEVEL:Status: %d,Value: %d ",status,value);
             env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmTxCmdGetRdsAfCode,

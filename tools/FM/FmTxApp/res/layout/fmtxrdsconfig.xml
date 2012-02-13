@@ -37,21 +37,6 @@
                                         android:layout_height="45dip" android:layout_weight="1"
                                         android:layout_marginRight="15dip">
                                 </Spinner>
-                        </TableRow>
-
-                        <TableRow android:id="@+id/widget140" android:layout_width="fill_parent"
-                                android:layout_alignParentLeft="true" android:layout_below="@+id/widget63"
-                                android:layout_height="50dip">
-                                <TextView android:id="@+id/txtAfCode" android:textSize="18sp"
-                                        android:layout_width="80dip" android:layout_height="45dip"
-                                        android:text="@string/afCode" android:textColor="@android:color/white"
-                                        android:layout_weight="1" android:layout_marginLeft="15dip">
-                                </TextView>
-                                <EditText android:id="@+id/afCode" android:textSize="18sp"
-                                        android:layout_width="80dip" android:editable="true"
-                                        android:layout_height="45dip" android:layout_weight="1"
-                                        android:layout_marginRight="15dip">
-                                </EditText>
                         </TableRow>-->
 
                                  <TableRow android:id="@+id/widget133" android:layout_width="fill_parent"
@@ -91,18 +76,33 @@
                                 </EditText>
                         </TableRow>
 
-                                                                         <TableRow android:id="@+id/widget130" android:layout_width="fill_parent"
+                        <TableRow android:id="@+id/widget130" android:layout_width="fill_parent"
                                 android:layout_alignParentLeft="true" android:layout_height="50dip"
-                                android:layout_below="@+id/widget140">
+                                android:layout_below="@+id/widget186">
 
-                                        <TextView android:id="@+id/txtRdsConfig"
+                                <TextView android:id="@+id/txtRdsConfig"
                                         android:textSize="18sp" android:text="@string/txtRdsConfig"
                                         android:layout_width="80dip" android:textColor="@android:color/white"
                                         android:layout_weight="1" android:layout_marginLeft="15dip" android:gravity="center_horizontal" android:layout_height="45dip" android:paddingTop="10dip" android:textStyle="bold">
                                 </TextView>
                                 </TableRow>
 
-                        <TableRow android:id="@+id/widget139" android:layout_width="fill_parent"
+                        <TableRow android:id="@+id/widget140" android:layout_width="fill_parent"
+                                android:layout_alignParentLeft="true" android:layout_below="@+id/widget130"
+                                android:layout_height="50dip">
+                                <TextView android:id="@+id/txtAfCode" android:textSize="18sp"
+                                        android:layout_width="80dip" android:layout_height="45dip"
+                                        android:text="@string/afCode" android:textColor="@android:color/white"
+                                        android:layout_weight="1" android:layout_marginLeft="15dip">
+                                </TextView>
+                                <EditText android:id="@+id/afCode" android:textSize="18sp"
+                                        android:layout_width="80dip" android:editable="true"
+                                        android:layout_height="45dip" android:layout_weight="1"
+                                        android:layout_marginRight="15dip">
+                                </EditText>
+                        </TableRow>
+
+                        <TableRow android:id="@+id/widget145" android:layout_width="fill_parent"
                                 android:layout_alignParentLeft="true" android:layout_below="@+id/widget140"
                                 android:layout_height="50dip">
                                 <TextView android:id="@+id/txtPiCode" android:textSize="18sp"

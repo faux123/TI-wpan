@@ -623,8 +623,7 @@ private void setRdsConfig()
         }
 
 
-        // Set Af Codei
-	/*
+        // Set Af Code
         int afCode = fmConfigPreferences.getInt(AF_CODE,DEFAULT_AFCODE);
         Log.i(TAG,"setRdsConfig-- >afCode = "+afCode);
         if (mAfCode != afCode) {
@@ -636,7 +635,7 @@ private void setRdsConfig()
             else{
             Log.i(TAG, "Fm Tx--> TX txSetRdsAfCode is SUCCESSFUll !!");
             }
-        }*/
+        }
 
 
 
