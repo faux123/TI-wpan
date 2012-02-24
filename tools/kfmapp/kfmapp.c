@@ -873,6 +873,7 @@ int fmapp_start_audio()
        tinymix_set_value(mixer, 72, 1);
        tinymix_set_value(mixer, 73, 1);
        tinymix_set_value(mixer, 34, 1);
+       tinymix_set_value(mixer, 50, 1);
 
        pcm_p = pcm_open(0, pdevice, PCM_OUT, &config);
        if (!pcm_p || !pcm_is_ready(pcm_p)) {
@@ -906,6 +907,7 @@ int fmapp_start_audio()
        tinymix_set_value(mixer, 72, 0);
        tinymix_set_value(mixer, 73, 0);
        tinymix_set_value(mixer, 34, 0);
+       tinymix_set_value(mixer, 50, 0);
 
        /* close the device */
        pcm_stop(pcm_p);

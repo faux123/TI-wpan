@@ -32,6 +32,9 @@ extern "C" {
 
 
 #define DEFAULT_RADIO_DEVICE    "/dev/radio0"
+
+#define FMTX_RDS_AF_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmtx_rds_af"
+
 #define DEFAULT_FM_ALSA_CARD    "hw:CARD=0"
 
 #define CTL_INDEX_0                0
@@ -152,8 +155,9 @@ typedef FMC_UINT FmTxCmdType;
 #define FM_TX_CMD_SET_RDS_TEXT_PS_MSG                            	((FmTxCmdType)47)
 #define FM_TX_CMD_SET_RDS_PTY_CODE					((FmTxCmdType)48)
 #define FM_TX_CMD_GET_RDS_PTY_CODE					((FmTxCmdType)49)
+#define FM_TX_CMD_SET_RDS_AF_CODE                                       ((FmTxCmdType)50)
 
-#define FM_TX_LAST_API_CMD						(FM_TX_CMD_GET_RDS_PTY_CODE)
+#define FM_TX_LAST_API_CMD                                              (FM_TX_CMD_SET_RDS_AF_CODE)
 #define FM_TX_CMD_NONE					0xFFFFFFFF
 
 

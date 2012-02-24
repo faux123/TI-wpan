@@ -72,8 +72,8 @@ public interface FmTxAppConstants {
     public static final int POWER_MAX = 31;
     public static final int PICODE_MIN = 0;
     public static final int PICODE_MAX = 65535;
-    public static final int AFCODE_MIN = 1;
-    public static final int AFCODE_MAX = 204;
+    public static final int AFCODE_MIN = 75000;
+    public static final int AFCODE_MAX = 108000;
     public static final int PTY_MIN = 0;
     public static final int PTY_MAX = 31;
     public static final int ECC_MIN = 0;
@@ -129,10 +129,10 @@ public interface FmTxAppConstants {
     public static final String DEF_RT_STRING = "TI Radio RT";
     public static final String DEF_PTY_STRING = "0";
     public static final String DEF_ECC_STRING = "0";
-    public static final int DEFAULT_AFCODE = 224;
+    public static final int DEFAULT_AFCODE = 108000;
     public static final int DEFAULT_PICODE = 0;
     public static final int  DEFAULT_EMPFILTER = 0;
-    public static final String DEFAULT_AFCODE_STRING = "224";
+    public static final String DEFAULT_AFCODE_STRING = "108000";
     public static final String DEFAULT_PICODE_STRING = "0";
     public static final int DEF_FREQ = 90000;
     public static final int EVENT_GET_FREQUENCY = 40;

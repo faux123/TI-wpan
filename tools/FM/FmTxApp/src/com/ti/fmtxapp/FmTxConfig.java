@@ -52,7 +52,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
     ********************************************/
     private Button btnCancel,btnOk;
     private Spinner spnMonoStereo/*spnEcc,spnRepetoire,spnTxMode,spnDisplayMode*/;
-    private EditText txtPsStr,textPower,edtPiCode;/*edtAfCode;    */
+    private EditText txtPsStr,textPower,edtPiCode,edtAfCode;
     private EditText edtRadioText,edtPty;
     private CheckBox rbtnPs,rbtnRt;
 /*    private CheckBox chbRdsMode;
@@ -115,7 +115,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
     textPower = (EditText)findViewById(R.id.powLevel);
 
     edtPiCode = (EditText)findViewById(R.id.piCode);
-    //edtAfCode = (EditText)findViewById(R.id.afCode);
+    edtAfCode = (EditText)findViewById(R.id.afCode);
     //rbtnTp=(RadioButton)findViewById(R.id.rbtnTp);
     //rbtnTp.setOnCheckedChangeListener(this);
 
@@ -379,9 +379,9 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
         textPower.setText(fmConfigPreferences.getString(POWER_STRING,DEF_POWER_STRING));
         txtPsStr.setText(fmConfigPreferences.getString(PS_STRING,DEF_PS_STRING));
         Log.i(TAG,"updateUiFromPreference() --> PS_STRING = "+txtPsStr.getText().toString());
-        /*edtAfCode.setText(fmConfigPreferences.getString(AFCODE_STRING,DEFAULT_AFCODE_STRING));
+        edtAfCode.setText(fmConfigPreferences.getString(AFCODE_STRING,DEFAULT_AFCODE_STRING));
 
-        spnDisplayMode.setSelection(fmConfigPreferences.getInt(DISPLAY_MODE, DEFAULT_DISPLAYMODE));
+        /*spnDisplayMode.setSelection(fmConfigPreferences.getInt(DISPLAY_MODE, DEFAULT_DISPLAYMODE));
         spnTxMode.setSelection(fmConfigPreferences.getInt(TX_MODE, DEFAULT_TXMODE));
         spnRepetoire.setSelection(fmConfigPreferences.getInt(REPERTOIRE, DEFAULT_REPERTOIRE));*/
         spnMonoStereo.setSelection(fmConfigPreferences.getInt(MONO_STEREO, DEFAULT_MONOSTEREO));
@@ -430,7 +430,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
         savePtyCode();
         sendAdvanceConfigIntent();
         savePiCode();
-    /*    saveAfCode(); */
+        saveAfCode();
     }
 
     /** Checks the Power value for validity */
@@ -553,7 +553,7 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
     saveAfCode()
 
 *********************************************************************/
-/*    private void saveAfCode()
+    private void saveAfCode()
     {
 
         fmConfigPreferences = getSharedPreferences("fmConfigPreferences",MODE_PRIVATE);
@@ -598,7 +598,6 @@ View.OnClickListener,CompoundButton.OnCheckedChangeListener,FmTxAppConstants
               }
 
     }
-*/
 
 /*********************************************************************
 
