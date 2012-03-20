@@ -18,8 +18,8 @@ LOCAL_C_INCLUDES:=\
 	$(call include-path-for, bluez)/lib
 
 
-LOCAL_SHARED_LIBRARIES:= libnetutils libcutils libbluetoothd libbluetooth
-LOCAL_MODULE:=libantenable
+LOCAL_SHARED_LIBRARIES:= libbluetoothd libbluetooth
+LOCAL_MODULE:=ant_enabler
 LOCAL_MODULE_TAGS:= eng
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_EXECUTABLE)

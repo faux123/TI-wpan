@@ -47,12 +47,17 @@
 #include "ant_enabler.h"
 #include <cutils/log.h>
 #include <fcntl.h>
+#include <syslog.h>
+
+#define HCIATTACH_DEBUG
 
 #ifdef HCIATTACH_DEBUG
-#define DPRINTF(x...) printf(x)
+#define DPRINTF(fmt, x...) printf(fmt, ## x)
 #else
-#define DPRINTF(x...)
+#define DPRINTF(fmt, x...)
 #endif
+
+#define LOGE(fmt, x...) DPRINTF("%s:%d " fmt "\n",__FUNCTION__,__LINE__, ## x)
 
 #define HCIUARTGETDEVICE	_IOR('U', 202, int)
 
@@ -180,132 +185,10 @@ static void bts_unload_script(FILE* fp)
                 fclose(fp);
 }
 
-/*static int is_it_texas(const uint8_t *respond)
-  {
-  uint16_t manufacturer_id;
-
-  manufacturer_id = MAKEWORD(respond[11], respond[12]);
-  LOGE( "HCI device is_it_texas manufacturer_id %d\n", manufacturer_id);
-
-  return TI_MANUFACTURER_ID == manufacturer_id ? 1 : 0;
-  }
-
-  static const char *get_firmware_name(const uint8_t *respond)
-  {
-  static char firmware_file_name[PATH_MAX] = {0};
-  uint16_t version = 0, chip = 0, min_ver = 0, maj_ver = 0;
-  LOGE( "HCI device is_it_texas get_firmware_name entered\n");
-
-  version = MAKEWORD(respond[13], respond[14]);
-  chip =  (version & 0x7C00) >> 10;
-  min_ver = (version & 0x007F);
-  maj_ver = (version & 0x0380) >> 7;
-
-  if (version & 0x8000)
-  maj_ver |= 0x0008;
-
-  sprintf(firmware_file_name, FIRMWARE_DIRECTORY "ANT_%d.%d.%d.bts", chip, maj_ver, min_ver);
-  LOGE( "HCI device is_it_texas firmware_file_name %s\n", firmware_file_name);
-
-  return firmware_file_name;
-  }*/
-
 static void brf_delay(struct bts_action_delay *delay)
 {
         usleep(1000 * delay->msec);
 }
-
-/*static int uart_speed(int s)
-  {
-  switch (s) {
-  case 9600:
-  return B9600;
-  case 19200:
-  return B19200;
-  case 38400:
-  return B38400;
-  case 57600:
-  return B57600;
-  case 115200:
-  return B115200;
-  case 230400:
-  return B230400;
-  case 460800:
-  return B460800;
-  case 500000:
-  return B500000;
-  case 576000:
-  return B576000;
-  case 921600:
-  return B921600;
-  case 1000000:
-  return B1000000;
-  case 1152000:
-  return B1152000;
-  case 1500000:
-  return B1500000;
-  case 2000000:
-  return B2000000;
-#ifdef B2500000
-case 2500000:
-return B2500000;
-#endif
-#ifdef B3000000
-case 3000000:
-return B3000000;
-#endif
-#ifdef B3500000
-case 3500000:
-return B3500000;
-#endif
-#ifdef B4000000
-case 4000000:
-return B4000000;
-#endif
-default:
-return B57600;
-}
-}
-int set_speed(int fd, struct termios *ti, int speed)
-{
-if (cfsetospeed(ti, uart_speed(speed)) < 0)
-return -errno;
-
-if (cfsetispeed(ti, uart_speed(speed)) < 0)
-return -errno;
-
-if (tcsetattr(fd, TCSANOW, ti) < 0)
-return -errno;
-
-return 0;
-}
-
-static int brf_set_serial_params(struct bts_action_serial *serial_action,
-int fd, struct termios *ti)
-{
-fprintf(stderr, "texas: changing baud rate to %u, flow control to %u\n",
-serial_action->baud, serial_action->flow_control );
-tcflush(fd, TCIOFLUSH);
-
-if (serial_action->flow_control)
-        ti->c_cflag |= CRTSCTS;
-        else
-        ti->c_cflag &= ~CRTSCTS;
-
-        if (tcsetattr(fd, TCSANOW, ti) < 0) {
-                perror("Can't set port settings");
-                return -1;
-        }
-
-tcflush(fd, TCIOFLUSH);
-
-if (set_speed(fd, ti, serial_action->baud) < 0) {
-        perror("Can't set baud rate");
-        return -1;
-}
-
-return 0;
-}*/
 
 static int brf_send_command_socket(int fd, struct bts_action_send* send_action)
 {
@@ -390,22 +273,22 @@ static int brf_do_action(uint16_t brf_type, uint8_t *brf_action, long brf_size,
 
         switch (brf_type) {
                 case ACTION_SEND_COMMAND:
-                        DPRINTF("W");
+                        //LOGE("W");
                         ret = brf_send_command(fd, (struct bts_action_send*) brf_action, brf_size, hcill_installed);
                         break;
                 case ACTION_WAIT_EVENT:
-                        DPRINTF("R");
+                        //LOGE("R");
                         break;
                 case ACTION_SERIAL:
-                        DPRINTF("S");
+                        //LOGE("S");
                         //ret = brf_set_serial_params((struct bts_action_serial *) brf_action, fd, ti);
                         break;
                 case ACTION_DELAY:
-                        DPRINTF("D");
+                        //LOGE("D");
                         brf_delay((struct bts_action_delay *) brf_action);
                         break;
                 case ACTION_REMARKS:
-                        DPRINTF("C");
+                        //LOGE("C");
                         break;
                 default:
                         fprintf(stderr, "brf_init: unknown firmware action type (%d)\n", brf_type);
@@ -460,7 +343,7 @@ static int brf_do_script(int fd, struct termios *ti, const char *bts_file)
 
         /* is it the first time we are called ? */
         if (0 == hcill_installed) {
-                DPRINTF("Sending script to serial device\n");
+                LOGE("Sending script to serial device\n");
                 brf_script_file = bts_load_script(bts_file, &vers );
                 if (!brf_script_file) {
                         fprintf(stderr, "Warning: cannot find BTS file: %s\n",
@@ -478,7 +361,7 @@ static int brf_do_script(int fd, struct termios *ti, const char *bts_file)
                 }
         }
         else {
-                DPRINTF("Sending script to bluetooth socket\n");
+                LOGE("Sending script to bluetooth socket\n");
         }
 
         /* execute current action and continue to parse brf script file */
@@ -502,7 +385,7 @@ static int brf_do_script(int fd, struct termios *ti, const char *bts_file)
 
         bts_unload_script(brf_script_file);
         brf_script_file = NULL;
-        DPRINTF("\n");
+        LOGE("");
 
         return ret;
 }
@@ -655,4 +538,25 @@ int download_ant_firmware(int ant_enable)
         LOGE( "ant_enabler: inside download_ant_firmware\n");
         return script_download_init(ant_enable);
 }
+
+int main(int argc, char** argv)
+{
+        LOGE( "ant_enabler: main argc:%d",argc);
+        if (argc != 2 ) {
+                LOGE( "no arguments");
+                return -1;
+        }
+
+        LOGE( "argv[1]:%s",argv[1]);
+
+        if(strncmp("ble",argv[1],3) == 0) {
+                LOGE( "enabling ble");
+                return download_ant_firmware(0);
+        } else {
+                LOGE( "enabling ant");
+                return download_ant_firmware(1);
+        }
+        return 0;
+}
+
 #endif
