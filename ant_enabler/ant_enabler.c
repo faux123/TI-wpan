@@ -22,6 +22,7 @@
  *
  */
 
+#ifdef BLUETI_ENHANCEMENT
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -654,3 +655,4 @@ int download_ant_firmware(int ant_enable)
         LOGE( "ant_enabler: inside download_ant_firmware\n");
         return script_download_init(ant_enable);
 }
+#endif

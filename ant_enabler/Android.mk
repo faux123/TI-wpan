@@ -22,7 +22,4 @@ LOCAL_SHARED_LIBRARIES:= libnetutils libcutils libbluetoothd libbluetooth
 LOCAL_MODULE:=libantenable
 LOCAL_MODULE_TAGS:= eng
 
-#include $(BUILD_EXECUTABLE)
 include $(BUILD_SHARED_LIBRARY)
-
-

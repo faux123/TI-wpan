@@ -20,7 +20,7 @@
  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
+#ifdef BLUETI_ENHANCEMENT
 #include <termios.h>
 
 #ifndef N_HCI
@@ -54,3 +54,4 @@ int ath3k_init(int fd, int speed, int init_speed, char *bdaddr,
                 struct termios *ti);
 int ath3k_post(int fd, int pm);
 int qualcomm_init(int fd, int speed, struct termios *ti, const char *bdaddr);
+#endif
