@@ -43,4 +43,5 @@ PRODUCT_COPY_FILES += \
   device/ti/proprietary-open/wl12xx/wpan/fmradio/fmc_ch8_1893.2.bts:system/etc/firmware/fmc_ch8_1893.2.bts \
   device/ti/proprietary-open/wl12xx/wpan/fmradio/fm_rx_ch8_1893.2.bts:system/etc/firmware/fm_rx_ch8_1893.2.bts \
   device/ti/proprietary-open/wl12xx/wpan/fmradio/fm_tx_ch8_1893.2.bts:system/etc/firmware/fm_tx_ch8_1893.2.bts \
-  device/ti/proprietary-open/wl12xx/wpan/nfc/TIInit_11.7.27.bts:system/etc/firmware/TIInit_11.7.27.bts
+  device/ti/proprietary-open/wl12xx/wpan/nfc/TIInit_11.7.27.bts:system/etc/firmware/TIInit_11.7.27.bts \
+  system/bluetooth/data/main.conf:system/etc/bluetooth/main.conf
