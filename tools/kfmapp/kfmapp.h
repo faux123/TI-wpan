@@ -1,7 +1,7 @@
 /*
  *  TI FM kernel driver's sample application.
  *
- *  Copyright (C) 2010 Texas Instruments
+ *  Copyright (C) 2012 Texas Instruments
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as

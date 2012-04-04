@@ -1,7 +1,7 @@
 /*
  *  TI FM kernel driver's sample application.
  *
- *  Copyright (C) 2010 Texas Instruments
+ *  Copyright (C) 2012 Texas Instruments
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -31,6 +31,7 @@
 #include <poll.h>
 
 #include "kfmapp.h"
+#include "fm_mixer.h"
 
 static unsigned int pdevice = 0;                        /* playback device */
 static unsigned int cdevice = 1;                        /* capture device */
@@ -319,7 +320,7 @@ int fmapp_set_tx_rds_radio_pi_code(char *cmd)
 
 int fmapp_set_tx_rds_radio_af(char *cmd)
 {
-    int fd, res, af_freq;
+    int fd, res;
 
     fd = open(FMTX_RDS_AF_SYSFS_ENTRY, O_RDWR);
     if (fd < 0) {
@@ -862,18 +863,17 @@ int fmapp_start_audio()
 
    if (fm_aud_enable == 0){
        /* Set Tinymix controles */
-       tinymix_set_value(mixer, 77, 2);
-       tinymix_set_value(mixer, 76, 2);
-       tinymix_set_value(mixer, 64, 1);
-       tinymix_set_value(mixer, 65, 4);
-       tinymix_set_value(mixer, 55, 12);
-       tinymix_set_value(mixer, 54, 11);
-       tinymix_set_value(mixer, 51, 1);
-       tinymix_set_value(mixer, 9, 120);
-       tinymix_set_value(mixer, 72, 1);
-       tinymix_set_value(mixer, 73, 1);
-       tinymix_set_value(mixer, 34, 1);
-       tinymix_set_value(mixer, 50, 1);
+       tinymix_set_value(mixer, ANALOG_RIGHT_CAPTURE_ROUTE, AUX_FM_RIGHT);
+       tinymix_set_value(mixer, ANALOG_LEFT_CAPTURE_ROUTE, AUX_FM_LEFT);
+       tinymix_set_value(mixer, CAPTURE_PREAMPLIFIER_VOLUME, 1);
+       tinymix_set_value(mixer, CAPTURE_VOLUME, 4);
+       tinymix_set_value(mixer, MUX_UL10, AMIC1);
+       tinymix_set_value(mixer, MUX_UL11, AMIC0);
+       tinymix_set_value(mixer, DL1_MIXER_MULTIMEDIA, ON);
+       tinymix_set_value(mixer, HEADSET_RIGHT_PLAYBACK, ON);
+       tinymix_set_value(mixer, HEADSET_LEFT_PLAYBACK, ON);
+       tinymix_set_value(mixer, DL1_PDM_SWITCH, ON);
+       tinymix_set_value(mixer, DL1_MIXER_CAPTURE, ON);
 
        pcm_p = pcm_open(0, pdevice, PCM_OUT, &config);
        if (!pcm_p || !pcm_is_ready(pcm_p)) {
@@ -881,33 +881,34 @@ int fmapp_start_audio()
                    pcm_get_error(pcm_p));
            return 0;
        }
-       printf("Playback device opened successfully");
+       printf("Playback device opened successfully\n");
        pcm_c = pcm_open(0, cdevice, PCM_IN, &config);
        if (!pcm_c || !pcm_is_ready(pcm_c)) {
            fprintf(stderr, "Unable to open PCM device (%s)\n",
                    pcm_get_error(pcm_c));
            return 0;
        }
-       printf("Capture device opened successfully");
+       tinymix_set_value(mixer, 9, 120);
+       printf("Capture device opened successfully\n");
        pcm_start(pcm_c);
        pcm_start(pcm_p);
-       printf(" Trigered the loopback");
+       printf("Trigered the loopback\n");
        fm_aud_enable = 1;
    }
    else {
        /* Set Tinymix controls to Normal*/
-       tinymix_set_value(mixer, 77, 0);
-       tinymix_set_value(mixer, 76, 0);
-       tinymix_set_value(mixer, 64, 0);
-       tinymix_set_value(mixer, 65, 0);
-       tinymix_set_value(mixer, 55, 0);
-       tinymix_set_value(mixer, 54, 0);
-       tinymix_set_value(mixer, 51, 0);
-       tinymix_set_value(mixer, 9, 0);
-       tinymix_set_value(mixer, 72, 0);
-       tinymix_set_value(mixer, 73, 0);
-       tinymix_set_value(mixer, 34, 0);
-       tinymix_set_value(mixer, 50, 0);
+       tinymix_set_value(mixer, ANALOG_RIGHT_CAPTURE_ROUTE, OFF);
+       tinymix_set_value(mixer, ANALOG_LEFT_CAPTURE_ROUTE, OFF);
+       tinymix_set_value(mixer, CAPTURE_PREAMPLIFIER_VOLUME, OFF);
+       tinymix_set_value(mixer, CAPTURE_VOLUME, OFF);
+       tinymix_set_value(mixer, MUX_UL10, OFF);
+       tinymix_set_value(mixer, MUX_UL11, OFF);
+       tinymix_set_value(mixer, DL1_MIXER_MULTIMEDIA, OFF);
+       tinymix_set_value(mixer, DL1_CAPTURE_PLAYBACK_VOLUME, OFF);
+       tinymix_set_value(mixer, HEADSET_RIGHT_PLAYBACK, OFF);
+       tinymix_set_value(mixer, HEADSET_LEFT_PLAYBACK, OFF);
+       tinymix_set_value(mixer, DL1_PDM_SWITCH, OFF);
+       tinymix_set_value(mixer, DL1_MIXER_CAPTURE, OFF);
 
        /* close the device */
        pcm_stop(pcm_p);
