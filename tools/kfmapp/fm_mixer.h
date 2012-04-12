@@ -25,6 +25,7 @@
 #define DL1_CAPTURE_PLAYBACK_VOLUME    9
 #define DL1_PDM_SWITCH                 34
 #define DL1_MIXER_CAPTURE              50
+#define AMIC_UL_VOLUME                 27
 
 #ifdef ENABLE_OMAP5_FM
 /* OMAP5 mixer values */
@@ -42,9 +43,12 @@
 #define HEADSET_LEFT_PLAYBACK          73
 #endif
 
-#define AUX_FM_RIGHT                   2
-#define AUX_FM_LEFT                    2
+#define AUX_FM_RIGHT                   2  /* Analog FM Input fed to Phoenix */
+#define AUX_FM_LEFT                    2  /* Analog FM Input fed to Phoenix */
+#define MMEXT_LEFT                     9  /* Digital FM input fed to ABE via MM_EXT_IN*/
+#define MMEXT_RIGHT                    10 /* Digital FM input fed to ABE via MM_EXT_IN*/
 #define AMIC0                          11
 #define AMIC1                          12
+
 #define ON                             1
 #define OFF                            0

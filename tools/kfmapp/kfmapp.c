@@ -40,6 +40,11 @@ struct pcm *pcm_p = NULL;
 struct pcm *pcm_c = NULL;
 struct mixer *mixer;
 
+#ifdef ENABLE_OMAP5_FM
+/* FM Rx digital on OMAP5 */
+static int fm_digital_enable;
+#endif
+
 /* #define V4L2_TUNER_SUB_RDS 0x10 */
 
 static char *g_mutemodes[]={"Mute ON","Mute OFF","Attenuate Voice"};
@@ -122,7 +127,10 @@ void fmapp_display_rx_menu(void)
    printf("g? get rssi threshold\n");
    printf("ga get tuner attributes\n");
 /* printf("gn auto scan\n"); */
-   printf("A Start FM RX Audio Routing\n");
+   printf("A Start FM RX Analog Audio Routing\n");
+#ifdef ENABLE_OMAP5_FM
+   printf("D Start FM RX Digital Audio Routing\n");
+#endif
    printf("q quit rx menu\n");
 }
 int fmapp_get_tx_ant_imp(void)
@@ -863,12 +871,23 @@ int fmapp_start_audio()
 
    if (fm_aud_enable == 0){
        /* Set Tinymix controles */
-       tinymix_set_value(mixer, ANALOG_RIGHT_CAPTURE_ROUTE, AUX_FM_RIGHT);
-       tinymix_set_value(mixer, ANALOG_LEFT_CAPTURE_ROUTE, AUX_FM_LEFT);
        tinymix_set_value(mixer, CAPTURE_PREAMPLIFIER_VOLUME, 1);
        tinymix_set_value(mixer, CAPTURE_VOLUME, 4);
+#ifdef ENABLE_OMAP5_FM
+       if(fm_digital_enable == 1) {
+       /* FM RX Digital path */
+       tinymix_set_value(mixer, MUX_UL10, MMEXT_LEFT);
+       tinymix_set_value(mixer, MUX_UL11, MMEXT_RIGHT);
+       tinymix_set_value(mixer, AMIC_UL_VOLUME, OFF);
+       }
+       else {
+       /* FM RX Analog path */
+       tinymix_set_value(mixer, ANALOG_RIGHT_CAPTURE_ROUTE, AUX_FM_RIGHT);
+       tinymix_set_value(mixer, ANALOG_LEFT_CAPTURE_ROUTE, AUX_FM_LEFT);
        tinymix_set_value(mixer, MUX_UL10, AMIC1);
        tinymix_set_value(mixer, MUX_UL11, AMIC0);
+       }
+#endif
        tinymix_set_value(mixer, DL1_MIXER_MULTIMEDIA, ON);
        tinymix_set_value(mixer, HEADSET_RIGHT_PLAYBACK, ON);
        tinymix_set_value(mixer, HEADSET_LEFT_PLAYBACK, ON);
@@ -888,8 +907,10 @@ int fmapp_start_audio()
                    pcm_get_error(pcm_c));
            return 0;
        }
-       tinymix_set_value(mixer, 9, 120);
        printf("Capture device opened successfully\n");
+
+       tinymix_set_value(mixer, DL1_CAPTURE_PLAYBACK_VOLUME, 120);
+
        pcm_start(pcm_c);
        pcm_start(pcm_p);
        printf("Trigered the loopback\n");
@@ -910,6 +931,13 @@ int fmapp_start_audio()
        tinymix_set_value(mixer, DL1_PDM_SWITCH, OFF);
        tinymix_set_value(mixer, DL1_MIXER_CAPTURE, OFF);
 
+#ifdef ENABLE_OMAP5_FM
+       /* Set Tinymix controls to Normal */
+       if (fm_digital_enable)
+         tinymix_set_value(mixer, AMIC_UL_VOLUME, 120);
+
+       fm_digital_enable = 0;
+#endif
        /* close the device */
        pcm_stop(pcm_p);
        pcm_stop(pcm_c);
@@ -1375,6 +1403,10 @@ void fmapp_execute_rx_other_command(char *cmd)
      case 'e':
           fmapp_set_rx_deemphasis_filter_mode(fm_snd_ctrl);
           break;
+#endif
+#ifdef ENABLE_OMAP5_FM
+     case 'D':
+         fm_digital_enable =1;
 #endif
      case 'A':
       fmapp_start_audio();
