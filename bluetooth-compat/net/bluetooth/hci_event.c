@@ -2398,7 +2398,7 @@ static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff
 			goto not_found;
 		}
 
-		if (key->type == HCI_LK_COMBINATION && key->pin_len < 16 &&
+		if (key->type == HCI_LK_COMBINATION && key->pin_len < 4 &&
 				conn->pending_sec_level == BT_SECURITY_HIGH) {
 			BT_DBG("%s ignoring key unauthenticated for high \
 							security", hdev->name);

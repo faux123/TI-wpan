@@ -681,7 +681,7 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
 	   For pre 2.1 units. */
 	if (conn->key_type == HCI_LK_COMBINATION &&
 			(sec_level != BT_SECURITY_HIGH ||
-			conn->pin_length == 16))
+			conn->pin_length >= 4))
 		goto encrypt;
 
 auth:
