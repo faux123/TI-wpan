@@ -107,7 +107,7 @@ void fmapp_display_rx_menu(void)
    printf("- decreases the volume\n");
    printf("v <0-65535> sets the volume\n");
    printf("gv get volume\n");
-   printf("b<value> switches Japan / Eur-Us (0=US/Eur & 1=Japan)\n");
+   printf("b<value> Band switch(0=US/Eur, 1=Japan, 2=Russian and 3=Weather)\n");
    printf("gb get band\n");
    printf("s switches stereo / mono\n");
    printf("gs get stereo/mono mode\n");
@@ -235,7 +235,7 @@ int fmapp_get_rx_frequency(void)
 
    div = (vt.capability & V4L2_TUNER_CAP_LOW) ? 1000 : 1;
 
-   printf("Tuned to frequency %3.2f MHz \n",vf.frequency / ( 16.0 * div));
+   printf("Tuned to frequency %3.3f MHz \n",vf.frequency / ( 16.0 * div));
    return 0;
 }
 
@@ -532,7 +532,7 @@ int fmapp_set_rx_frequency(char *cmd)
        printf("Failed to set frequency %f\n",user_freq);
        return res;
    }
-   printf("Tuned to frequency %3.2f MHz\n", vf.frequency / (16.0 * div));
+   printf("Tuned to frequency %3.3f MHz\n", vf.frequency / (16.0 * div));
    return 0;
 }
 
@@ -803,7 +803,22 @@ int fmapp_set_band(char *cmd)
         goto exit;
     }
 
-    printf("FM Band is set to %s\n", atoi(cmd) == 0?"US/EUROPE":"JAPAN");
+    printf("FM Band is set to: ");
+    switch (atoi(cmd)) {
+        case 0:
+            printf("JAPAN\n");
+            break;
+        case 1:
+            printf("US/EUROPE\n");
+            break;
+        case 2:
+            printf("RUSSIAN\n");
+            break;
+        case 3:
+            printf("WEATHER\n");
+            break;
+    }
+
 exit:
     close(fd);
     return res;
