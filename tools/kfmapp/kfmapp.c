@@ -61,6 +61,7 @@ static pthread_t g_rds_thread_ptr;
 volatile char g_rds_thread_terminate,g_rds_thread_running;
 
 static int g_radio_fd;
+static int g_wrap_around;
 
 /* Program Type */
 static char *pty_str[]= {"None", "News", "Current Affairs",
@@ -121,6 +122,7 @@ void fmapp_display_rx_menu(void)
    printf("gz get rds system\n"); */
    printf("c<value> set rds af switch(0-OFF & 1=ON)\n");
    printf("gc get rds af switch\n");
+   printf("w Enable/Disable wrap around seek\n");
    printf("< seek down\n");
    printf("> seek up\n");
    printf("? <(0)-(127)> set RSSI threshold\n");
@@ -664,6 +666,17 @@ int fmapp_get_rx_mute_mode(void)
    printf("%s\n",g_mutemodes[vctrl.value]);
    return 0;
 }
+
+void fmapp_rx_wrap_around(void)
+{
+   if(g_wrap_around == 0)
+       g_wrap_around = 1;
+   else
+       g_wrap_around = 0;
+
+   printf("Wrap around seek: %s\n",g_wrap_around?"Enabled":"Disabled");
+}
+
 int fmapp_rx_seek(int seek_direction)
 {
    struct ti_v4l2_hw_freq_seek frq_seek;
@@ -673,7 +686,7 @@ int fmapp_rx_seek(int seek_direction)
    frq_seek.type = 1;
    frq_seek.seek_upward = seek_direction;
    frq_seek.spacing = 200000;
-   frq_seek.wrap_around = 0;
+   frq_seek.wrap_around = g_wrap_around;
    errno = 0;
    res = ioctl(g_radio_fd,VIDIOC_S_HW_FREQ_SEEK,&frq_seek);
    if(errno == EAGAIN)
@@ -1390,6 +1403,9 @@ void fmapp_execute_rx_other_command(char *cmd)
       break;
      case '>':
           fmapp_rx_seek(FM_SEARCH_DIRECTION_UP);
+      break;
+    case 'w':
+          fmapp_rx_wrap_around();
       break;
      case 'b':
           fmapp_set_band(cmd+1);
