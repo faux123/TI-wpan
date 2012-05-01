@@ -46,6 +46,8 @@ extern "C" {
 #define FM_BAND_SWITCH_CTL_NAME    "Region Switch"
 #define FM_BAND_EUROPE_US          0
 #define FM_BAND_JAPAN              1
+#define FM_BAND_RUSSIAN            2
+#define FM_BAND_WEATHER            3
 
 
 #define FM_RF_DEPENDENT_MUTE_CTL_NAME     "RF Dependent Mute"

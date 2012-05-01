@@ -867,7 +867,7 @@ private void startup() {
             /* tune to default frequency after the band change callback . */
 
             case EVENT_BAND_CHANGE:
-                Log.i(TAG, "enter handleMessage ----EVENT_BAND_CHANGE");
+                Log.i(TAG, "enter handleMessage ----EVENT_BAND_CHANGE "+sBand);
                 /*
                  * Tune to the last stored frequency at the
                  * enable/re-enable,else tune to the default frequency when band
@@ -876,10 +876,20 @@ private void startup() {
 
                 if (sdefaultSettingOn == true) {
                     /* Set the default frequency */
-                    if (sBand == FM_BAND_EUROPE_US)
-                        lastTunedFrequency = (float) DEFAULT_FREQ_EUROPE;
-                    else
-                        lastTunedFrequency = (float) DEFAULT_FREQ_JAPAN;
+                    switch(sBand) {
+                            case FM_BAND_EUROPE_US:
+                                lastTunedFrequency = (float) DEFAULT_FREQ_EUROPE;
+                                break;
+                            case FM_BAND_JAPAN:
+                                lastTunedFrequency = (float) DEFAULT_FREQ_JAPAN;
+                                break;
+                            case FM_BAND_RUSSIAN:
+                                lastTunedFrequency = (float) DEFAULT_FREQ_RUSSIAN;
+                                break;
+                            case FM_BAND_WEATHER:
+                                lastTunedFrequency = (float) DEFAULT_FREQ_WEATHER;
+                                break;
+                    }
                 }
 
                 mStatus = sFmRadio.rxTune_nb((int)(lastTunedFrequency.floatValue()*1000));
@@ -1075,10 +1085,20 @@ private void startup() {
                     sBand = band;
                     if (sdefaultSettingOn == true) {
                         /* Set the default frequency */
-                        if (sBand == FM_BAND_EUROPE_US)
-                            lastTunedFrequency = (float) DEFAULT_FREQ_EUROPE;
-                        else
-                            lastTunedFrequency = (float) DEFAULT_FREQ_JAPAN;
+                        switch(sBand) {
+                            case FM_BAND_EUROPE_US:
+                                lastTunedFrequency = (float) DEFAULT_FREQ_EUROPE;
+                                break;
+                            case FM_BAND_JAPAN:
+                                lastTunedFrequency = (float) DEFAULT_FREQ_JAPAN;
+                                break;
+                            case FM_BAND_RUSSIAN:
+                                lastTunedFrequency = (float) DEFAULT_FREQ_RUSSIAN;
+                                break;
+                            case FM_BAND_WEATHER:
+                                lastTunedFrequency = (float) DEFAULT_FREQ_WEATHER;
+                                break;
+                        }
                     }
 
                     lastTunedFrequency = (float) lastTunedFrequency ;

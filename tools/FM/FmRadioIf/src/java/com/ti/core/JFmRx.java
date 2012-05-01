@@ -397,7 +397,7 @@ public class JFmRx {
     }
 
     public static enum JFmRxBand implements IJFmEnum<Integer> {
-       FMC_BAND_EUROPE_US(0x00), FMC_BAND_JAPAN(0x01);
+       FMC_BAND_EUROPE_US(0x00), FMC_BAND_JAPAN(0x01), FMC_BAND_RUSSIAN(0x02), FMC_BAND_WEATHER(0x03);
 
        private final int band;
 

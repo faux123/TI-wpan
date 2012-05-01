@@ -2072,13 +2072,43 @@ public class StubFmService extends IFmRadio.Stub implements
     }
 
     static int BaseFreq() {
-        return mCurrentBand == FM_BAND_JAPAN ? FM_FIRST_FREQ_JAPAN_KHZ
-                : FM_FIRST_FREQ_US_EUROPE_KHZ;
+        int freq = 0;
+
+        switch(mCurrentBand) {
+            case FM_BAND_JAPAN:
+                freq = FM_FIRST_FREQ_JAPAN_KHZ;
+                break;
+            case FM_BAND_EUROPE_US:
+                freq = FM_FIRST_FREQ_US_EUROPE_KHZ;
+                break;
+            case FM_BAND_RUSSIAN:
+                freq = FM_FIRST_FREQ_RUSSIAN_KHZ;
+                break;
+            case FM_BAND_WEATHER:
+                freq = FM_FIRST_FREQ_WEATHER_KHZ;
+                break;
+            }
+        return freq;
     }
 
     static int LastFreq() {
-        return mCurrentBand == FM_BAND_JAPAN ? FM_LAST_FREQ_JAPAN_KHZ
-                : FM_LAST_FREQ_US_EUROPE_KHZ;
+        int freq = 0;
+
+        switch(mCurrentBand) {
+            case FM_BAND_JAPAN:
+                freq = FM_LAST_FREQ_JAPAN_KHZ;
+                break;
+            case FM_BAND_EUROPE_US:
+                freq = FM_LAST_FREQ_US_EUROPE_KHZ;
+                break;
+            case FM_BAND_RUSSIAN:
+                freq = FM_LAST_FREQ_RUSSIAN_KHZ;
+                break;
+            case FM_BAND_WEATHER:
+                freq = FM_LAST_FREQ_WEATHER_KHZ;
+                break;
+            }
+        return freq;
     }
 
     /*************************************************************************************************

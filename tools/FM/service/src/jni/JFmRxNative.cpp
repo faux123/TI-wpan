@@ -424,10 +424,16 @@ static int nativeJFmRx_SetBand(JNIEnv *env, jobject obj,jlong jContextValue, jin
    int fd, res;
 
    switch(jFmBand) {
-       case 1:
+       case FM_BAND_WEATHER:
+           curr_band = '3';
+           break;
+       case FM_BAND_RUSSIAN:
+           curr_band = '2';
+           break;
+       case FM_BAND_JAPAN:
            curr_band = '1';
            break;
-       case 0:
+       case FM_BAND_EUROPE_US:
        default:
            curr_band = '0';
            break;

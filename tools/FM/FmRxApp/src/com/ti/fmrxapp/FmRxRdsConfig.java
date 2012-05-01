@@ -128,6 +128,8 @@ public class FmRxRdsConfig extends Activity implements View.OnKeyListener,
         spnBand.setAdapter(bandAdapter);
         bandAdapter.add("European");
         bandAdapter.add("Japanese");
+        bandAdapter.add("Russian");
+        bandAdapter.add("Weather");
         spnBand.setOnItemSelectedListener(gItemSelectedHandler);
 
         // ChannelSpace Spinner

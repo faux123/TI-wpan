@@ -38,6 +38,8 @@
 	<string name="app_rds">FM Configurations</string>
 	<string name="freqRangeEurope"> 87.50MHz - 108.00MHz </string>
 	<string name="freqRangeJapan"> 76MHz - 90MHz </string>
+	<string name="freqRangeRussian"> 65.8MHz - 74MHz </string>
+	<string name="freqRangeWeather"> 162.4MHz - 162.55MHz </string>
 	<string name="label"> MHz </string>
 	<string name="labelhz"> MHz </string>
 	<string name="rx_freq_val"> </string>

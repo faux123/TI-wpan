@@ -71,6 +71,8 @@ public interface FmRxAppConstants {
     public static final int DEF_VOLUME = 10;
     public static final float DEFAULT_FREQ_EUROPE = (float) 87500 / 1000;
     public static final float DEFAULT_FREQ_JAPAN = (float) 76000 / 1000;
+    public static final float DEFAULT_FREQ_RUSSIAN = (float) 65800 / 1000;
+    public static final float DEFAULT_FREQ_WEATHER = (float) 162400 / 1000;
     public static final int DEFAULT_BAND = 0; // EuropeUS
     public static final int DEFAULT_MODE = 0; // Stereo
     public static final boolean DEFAULT_RDS = false;
@@ -151,4 +153,13 @@ public static final float APP_FM_FIRST_FREQ_JAPAN_KHZ = (float)76.0;
 
 public static final float APP_FM_LAST_FREQ_JAPAN_KHZ = (float)90.0;
 
+/* Russian band limits */
+public static final float APP_FM_FIRST_FREQ_RUSSIAN_KHZ = (float)65.8;
+
+public static final float APP_FM_LAST_FREQ_RUSSIAN_KHZ = (float)74.0;
+
+/* Weather band limits */
+public static final float APP_FM_FIRST_FREQ_WEATHER_KHZ = (float)162.4;
+
+public static final float APP_FM_LAST_FREQ_WEATHER_KHZ = (float)162.55;
 }
