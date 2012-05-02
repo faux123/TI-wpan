@@ -147,8 +147,9 @@ typedef FMC_UINT FmRxCmdType;
 #define FM_RX_CMD_COMPLETE_SCAN                            	((FmRxCmdType)41)	/*Perfrom Complete Scan on the selected Band*/
 #define FM_RX_CMD_COMPLETE_SCAN_PROGRESS                            	((FmRxCmdType)42)
 #define FM_RX_CMD_STOP_COMPLETE_SCAN                            	((FmRxCmdType)43)
-#define FM_RX_LAST_API_CMD						(FM_RX_CMD_STOP_COMPLETE_SCAN)
-#define FM_RX_CMD_NONE					0xFFFFFFFF
+#define FM_RX_CMD_SET_WRAP_SEEK_MODE                    ((FmRxCmdType)44)	/* Set Wrap Seek Mode command */
+#define FM_RX_LAST_API_CMD                              (FM_RX_CMD_SET_WRAP_SEEK_MODE)
+#define FM_RX_CMD_NONE                                  0xFFFFFFFF
 
 
 namespace android {

@@ -65,6 +65,7 @@ typedef pthread_t       THREAD_HANDLE;
 THREAD_HANDLE   p_threadHandle;         /* Thread Handle for RDS data  */
 static bool isThreadCreated = false;
 static int radio_fd;
+static int wrap_seek;
 //snd_ctl_t *fm_snd_ctrl;
 long jContext;
 volatile bool g_stopCommListener = false;
@@ -125,6 +126,7 @@ static jmethodID _sMethodId_nativeCb_fmRxCmdSetRdsSystem;
 static jmethodID _sMethodId_nativeCb_fmRxCmdSetRdsGroupMask;
 static jmethodID _sMethodId_nativeCb_fmRxCmdGetRdsGroupMask;
 static jmethodID _sMethodId_nativeCb_fmRxCmdSetRdsAfSwitchMode;
+static jmethodID _sMethodId_nativeCb_fmRxCmdSetWrapSeekMode;
 static jmethodID _sMethodId_nativeCb_fmRxCmdGetRdsAfSwitchMode;
 static jmethodID _sMethodId_nativeCb_fmRxCmdDisableAudio;
 static jmethodID _sMethodId_nativeCb_fmRxCmdDestroy;
@@ -820,11 +822,11 @@ static int nativeJFmRx_Seek(JNIEnv *env, jobject obj,jlong jContextValue,jint jd
     int status, div;
 
     V4L2_JBTL_LOGD("nativeJFmRx_Seek(): Entered");
-    V4L2_JBTL_LOGD("Seeking %s.. and channel spacing is %d\n",jdirection?"up":"down", chanl_spacing);
+    V4L2_JBTL_LOGD("Seeking %s.. and wrap seek is %d\n",jdirection?"up":"down", wrap_seek);
     frq_seek.seek_upward = jdirection;
         frq_seek.type = (v4l2_tuner_type)1;
         frq_seek.spacing = chanl_spacing;
-        frq_seek.wrap_around = 0;
+        frq_seek.wrap_around = wrap_seek;
 
     errno = 0;
     status = ioctl(radio_fd,VIDIOC_S_HW_FREQ_SEEK,&frq_seek);
@@ -990,6 +992,17 @@ static int  nativeJFmRx_DisableAudioRouting(JNIEnv *env, jobject obj,jlong jCont
 
     V4L2_JBTL_LOGD("nativeJFmRx_disableAudioRouting(): Exit");
      return FM_PENDING;
+}
+
+static int nativeJFmRx_SetWrapSeekMode(JNIEnv *env, jobject obj,jlong jContextValue,jint jWrapSeekMode)
+{
+    V4L2_JBTL_LOGD("nativeJFmRx_setWrapSeekMode(): Entered");
+
+    wrap_seek = jWrapSeekMode;
+
+    nativeJFmRx_Callback(jContext,0, FM_RX_CMD_SET_WRAP_SEEK_MODE,0);
+    V4L2_JBTL_LOGD("nativeJFmRx_setWrapSeekMode() wrap_seek mode = %d: Exit", wrap_seek);
+    return FM_PENDING;
 }
 
 static int nativeJFmRx_SetRdsAfSwitchMode(JNIEnv *env, jobject obj,jlong jContextValue,jint jRdsAfSwitchMode)
@@ -1652,6 +1665,13 @@ if no only then try to attach to the current thread. */
                                           (jlong)value);
                 break;
 
+            case FM_RX_CMD_SET_WRAP_SEEK_MODE:
+                env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmRxCmdSetWrapSeekMode,(jlong)context,
+                                          (jint)status,
+                                          (jint)command,
+                                          (jlong)value);
+                break;
+
             case FM_RX_CMD_GET_RDS_AF_SWITCH_MODE:
                 env->CallStaticVoidMethod(_sJClass,_sMethodId_nativeCb_fmRxCmdGetRdsAfSwitchMode,(jlong)context,
                                           (jint)status,
@@ -2087,6 +2107,10 @@ void nativeJFmRx_ClassInitNative(JNIEnv* env, jclass clazz){
             "(JIIJ)V");
     VERIFY_METHOD_ID(_sMethodId_nativeCb_fmRxCmdSetRdsAfSwitchMode);
 
+    _sMethodId_nativeCb_fmRxCmdSetWrapSeekMode = env->GetStaticMethodID(clazz,
+            "nativeCb_fmRxCmdSetWrapSeekMode",
+            "(JIIJ)V");
+    VERIFY_METHOD_ID(_sMethodId_nativeCb_fmRxCmdSetWrapSeekMode);
 
     _sMethodId_nativeCb_fmRxCmdGetRdsAfSwitchMode = env->GetStaticMethodID(clazz,
             "nativeCb_fmRxCmdGetRdsAfSwitchMode",
@@ -2176,6 +2200,7 @@ static JNINativeMethod JFmRxNative_sMethods[] = {
     {"nativeJFmRx_EnableAudioRouting","(J)I", (void*)nativeJFmRx_EnableAudioRouting},
     {"nativeJFmRx_DisableAudioRouting","(J)I", (void*)nativeJFmRx_DisableAudioRouting},
     {"nativeJFmRx_SetRdsAfSwitchMode","(JI)I", (void*)nativeJFmRx_SetRdsAfSwitchMode},
+    {"nativeJFmRx_SetWrapSeekMode","(JI)I", (void*)nativeJFmRx_SetWrapSeekMode},
     {"nativeJFmRx_GetRdsAfSwitchMode","(J)I", (void*)nativeJFmRx_GetRdsAfSwitchMode},
     {"nativeJFmRx_ChangeAudioTarget","(JII)I",(void*)nativeJFmRx_ChangeAudioTarget},
     {"nativeJFmRx_ChangeDigitalTargetConfiguration","(JI)I",(void*)nativeJFmRx_ChangeDigitalTargetConfiguration},

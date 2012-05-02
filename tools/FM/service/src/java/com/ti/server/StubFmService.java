@@ -2913,6 +2913,44 @@ public class StubFmService extends IFmRadio.Stub implements
      * Implementation of IFmRadio IPC interface
      *************************************************************************************************/
 
+    public boolean rxSetWrapSeekMode_nb(int mode) {
+        Log.i(TAG, "StubFmService:rxSetWrapSeekMode_nb  ");
+        if (mRxState != STATE_ENABLED) {
+            Log.e(TAG, "rxSetWrapSeekMode_nb: failed, fm not enabled  state "
+                    + mRxState);
+            return false;
+        }
+        mContext.enforceCallingOrSelfPermission(FMRX_ADMIN_PERM,
+                "Need FMRX_ADMIN_PERM permission");
+
+                if ((mIsSeekInProgress == false) && (mIsTuneInProgress == false)
+        && (mIsCompleteScanInProgress == false)) {
+        JFmRx.JFmRxWrapSeekMode lMode = JFmUtils.getEnumConst(
+                JFmRx.JFmRxWrapSeekMode.class, mode);
+        if (lMode == null) {
+            Log
+                    .e(TAG, "StubFmService:rxSetWrapSeekMode_nb invalid  lMode "
+                            + lMode);
+            return false;
+        }
+        JFmRxStatus status = mJFmRx.setWrapSeekMode(lMode);
+        Log.i(TAG, "mJFmRx.setWrapSeekMode returned status "
+                + status.toString());
+        if (status != JFmRxStatus.PENDING) {
+            Log.e(TAG, "mJFmRx.setWrapSeekMode returned status "
+                    + status.toString());
+
+            return false;
+        }
+
+        } else {
+            Log.e(TAG, "Seek is in progress.cannot call the API");
+            return false;
+        }
+        return true;
+
+    }
+
     public boolean rxSetRdsAfSwitchMode_nb(int mode) {
         Log.i(TAG, "StubFmService:rxSetRdsAfSwitchMode_nb  ");
         if (mRxState != STATE_ENABLED) {
@@ -5103,6 +5141,20 @@ public class StubFmService extends IFmRadio.Stub implements
 
 
 
+    }
+
+    public void fmRxCmdSetWrapSeekMode(JFmRx context, JFmRxStatus status,
+            int command, long value) {
+
+        Log.i(TAG, "StubFmService:fmRxCmdSetWrapSeekMode ");
+        Log.d(TAG,
+                "  fmRxCmdSetWrapSeekMode ( command: , status: , value: )"
+                        + command + "" + status + "" + value);
+
+        Log.d(TAG, "StubFmService:sending intent SET_WRAP_SEEK_ACTION");
+        Intent intent = new Intent(FmRadioIntent.SET_WRAP_SEEK_ACTION);
+        intent.putExtra(FmRadioIntent.STATUS, status);
+        mContext.sendBroadcast(intent, FMRX_PERM);
     }
 
     public void fmRxCmdSetRdsAfSwitchMode(JFmRx context, JFmRxStatus status,

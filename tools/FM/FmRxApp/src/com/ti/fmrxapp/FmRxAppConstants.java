@@ -59,6 +59,7 @@ public interface FmRxAppConstants {
     public static final int EVENT_GET_RDS_GROUPMASK = 36;
     public static final int EVENT_GET_FREQUENCY = 37;
     public static final int EVENT_COMPLETE_SCAN_PROGRESS = 38;
+    public static final int EVENT_SET_WRAP_SEEK = 39;
 
 
     /* Volume range */
@@ -79,6 +80,7 @@ public interface FmRxAppConstants {
     public static final int DEFAULT_DEEMP = 0;
     public static final int DEFAULT_RDS_SYSTEM = 0;
     public static final boolean DEFAULT_RDS_AF = false;
+    public static final boolean DEFAULT_WRAP_SEEK = false;
     public static final int DEFAULT_RSSI = 7;
     public static final int DEFAULT_CHANNELSPACE = 2;
 
@@ -115,6 +117,7 @@ public interface FmRxAppConstants {
     public static final String RDSSYSTEM = "RDSSYSTEM";
     public static final String DEEMP = "DEEMP";
     public static final String RDSAF = "RDSAF";
+    public static final String WRAPSEEK = "WRAPSEEK";
     public static final String RSSI = "RSSI";
     public static final String RSSI_STRING = "RSSI_STRING";
     public static final String DEF_RSSI_STRING = "7";

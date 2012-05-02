@@ -154,6 +154,9 @@ public interface FmRadioIntent {
     public static final String SET_RDS_AF_ACTION = "fm.rx.intent.action.SET_RDS_AF_ACTION";
 
     @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)
+    public static final String SET_WRAP_SEEK_ACTION = "fm.rx.intent.action.SET_WRAP_SEEK_ACTION";
+
+    @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)
     public static final String SET_RDS_SYSTEM_ACTION = "fm.rx.intent.action.SET_RDS_SYSTEM_ACTION";
 
     @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)

@@ -145,6 +145,7 @@ public class FmRxApp extends Activity implements View.OnClickListener,
     private int mMode = DEFAULT_MODE;
     private boolean mRds = DEFAULT_RDS;
     private boolean mRdsAf = DEFAULT_RDS_AF;
+    private boolean mWrapSeek = DEFAULT_WRAP_SEEK;
     private int mRdsSystem = INITIAL_VAL;
     private int mDeEmpFilter = INITIAL_VAL;
     private int mRssi = INITIAL_RSSI;
@@ -248,6 +249,7 @@ public class FmRxApp extends Activity implements View.OnClickListener,
         intentFilter.addAction(FmRadioIntent.ENABLE_RDS_ACTION);
         intentFilter.addAction(FmRadioIntent.DISABLE_RDS_ACTION);
         intentFilter.addAction(FmRadioIntent.SET_RDS_AF_ACTION);
+        intentFilter.addAction(FmRadioIntent.SET_WRAP_SEEK_ACTION);
         intentFilter.addAction(FmRadioIntent.SET_RDS_SYSTEM_ACTION);
         intentFilter.addAction(FmRadioIntent.SET_DEEMP_FILTER_ACTION);
         intentFilter.addAction(FmRadioIntent.SET_RSSI_THRESHHOLD_ACTION);
@@ -905,6 +907,10 @@ private void startup() {
                 Log.i(TAG, "enter handleMessage ----EVENT_ENABLE_RDS");
                 break;
 
+            case EVENT_SET_WRAP_SEEK:
+                Log.i(TAG, "enter handleMessage ----EVENT_SET_WRAP_SEEK");
+                break;
+
             /* Set RSSI after SET_RDS_AF callback */
             case EVENT_SET_RDS_AF:
                 Log.i(TAG, "enter handleMessage ----EVENT_SET_RDS_AF");
@@ -1264,7 +1270,6 @@ private void startup() {
                     DEFAULT_RDS_AF);
             int rdsAf = 0;
             rdsAf = rdsAfSwitch ? 1 : 0;
-            if (DBG)
             Log.d(TAG, "setRdsAf()--- rdsAfSwitch= " + rdsAf);
             if (mRdsAf != rdsAfSwitch) {
                 // Set RDS-AF if a new choice is made by the user
@@ -1279,6 +1284,20 @@ private void startup() {
                 }
                 mRdsAf = rdsAfSwitch;
             }
+
+    // Set Wrap Seek
+        boolean WrapSeekSwitch = fmConfigPreferences.getBoolean(WRAPSEEK,
+                    DEFAULT_WRAP_SEEK);
+            int WrapSeek = 0;
+            WrapSeek = WrapSeekSwitch ? 1 : 0;
+            Log.d(TAG, "setSwrapSeek()--- WrapSeekSwitch= " + WrapSeek);
+            mStatus = sFmRadio.rxSetWrapSeekMode_nb(WrapSeek);
+            if (mStatus == false) {
+                Log.e(TAG, "setWrapSeek()-- setWrapSeekMode(1) ->Erorr");
+                showAlert(this, "FmRadio", "Cannot set WRAP SEEK Mode ON!!!!");
+            }
+            mRdsAf = WrapSeekSwitch;
+
         // Set Rssi
         int rssiThreshHold = fmConfigPreferences.getInt(RSSI, DEFAULT_RSSI);
         Log.i(TAG, "setRssi()-ENTER --- rssiThreshHold= " + rssiThreshHold);
@@ -2461,6 +2480,13 @@ if (MAKE_FM_APIS_BLOCKING == true) {
 
                 mHandler.sendMessage(mHandler
                         .obtainMessage(EVENT_SET_RDS_AF, 0));
+            }
+
+            if (fmAction.equals(FmRadioIntent.SET_WRAP_SEEK_ACTION)) {
+                Log.i(TAG, "enter onReceive SET_WRAP_SEEK_ACTION " + fmAction);
+
+                mHandler.sendMessage(mHandler
+                        .obtainMessage(EVENT_SET_WRAP_SEEK, 0));
             }
 
             if (fmAction.equals(FmRadioIntent.SET_RDS_SYSTEM_ACTION)) {
