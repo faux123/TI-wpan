@@ -125,6 +125,7 @@ void fmapp_display_rx_menu(void)
    printf("w Enable/Disable wrap around seek\n");
    printf("< seek down\n");
    printf("> seek up\n");
+   printf("C Complete Scan\n");
    printf("? <(0)-(127)> set RSSI threshold\n");
    printf("g? get rssi threshold\n");
    printf("ga get tuner attributes\n");
@@ -701,6 +702,73 @@ int fmapp_rx_seek(int seek_direction)
    /* Display seeked freq */
    fmapp_get_rx_frequency();
    return 0;
+}
+
+int fmapp_rx_comp_scan(void)
+{
+    int fd, res, i, num_stations;
+    char cmd='1';
+    struct pollfd pfd;
+    unsigned char stations[410*4];
+
+    fd = open(FMRX_COMP_SCAN_SYSFS_ENTRY, O_RDWR);
+    if (fd < 0) {
+        printf("Can't open %s", FMRX_RDS_AF_SYSFS_ENTRY);
+        return -1;
+    }
+
+    res = write(fd, &cmd, sizeof(char));
+    if(res <= 0){
+        printf("Failed to Start Complete Scan\n");
+        goto exit;
+    }
+
+    printf("polling for data.");
+    while(1) {
+        printf(".");
+        memset(&pfd, 0, sizeof(pfd));
+        pfd.fd = g_radio_fd;
+        pfd.events = POLLIN;
+        res = poll(&pfd, 1, 10);
+        if (res == POLLIN){
+            /* Break the poll after Complete scan is done */
+            break;
+        }
+    }
+
+    printf("Poll end\n");
+
+    cmd = '2';
+    res = write(fd, &cmd, sizeof(char));
+    if(res < 0){
+        printf("Failed to read Complete Scan results\n");
+        goto exit;
+    }
+
+    num_stations = res;
+    printf("Found %d stations\n",num_stations);
+
+    memset(&stations, 0, 410*4);
+
+    res = read(g_radio_fd, &stations, res*4);
+    if(res < 0){
+        printf("reading %s failed %s\n",
+                FMRX_RDS_AF_SYSFS_ENTRY,strerror(res));
+        goto exit;
+    }
+
+    printf("res = %d\n",res);
+
+    for(i=0; i<4*num_stations; i=i+4) {
+        res = ((stations[i+3] << 24) + (stations[i+2] << 16) + (stations[i+1] << 8) + (stations[i]));
+        printf("Station[%d] = %d\n",((i/4 + 1)),res);
+    }
+
+    printf("FM Complete Scan finished\n");
+
+exit:
+    close(fd);
+    return res;
 }
 
 int fmapp_set_rx_af_switch(char *cmd)
@@ -1403,6 +1471,9 @@ void fmapp_execute_rx_other_command(char *cmd)
       break;
      case '>':
           fmapp_rx_seek(FM_SEARCH_DIRECTION_UP);
+      break;
+     case 'C':
+          fmapp_rx_comp_scan();
       break;
     case 'w':
           fmapp_rx_wrap_around();
