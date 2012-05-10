@@ -645,6 +645,30 @@ private void startup() {
                 setButtonLabels();
                 imgFmPower.setImageResource(R.drawable.poweron);
 
+                /* Setting the default band */
+                if (sdefaultSettingOn == false) {
+                     /* Set the default band */
+                        if (MAKE_FM_APIS_BLOCKING == true) {
+                                 // Code for blocking call
+                               mStatus = sFmRadio.rxSetBand(sBand);
+                                if (mStatus == false) {
+                            showAlert(getParent(), "FmRadio","Not able to setband!!!!");
+                           } else {
+                                lastTunedFrequency = (float) lastTunedFrequency ;
+                                 mStatus = sFmRadio.rxTune_nb((int)(lastTunedFrequency.floatValue()* 1000));
+                            if (mStatus == false) {
+                                   showAlert(getParent(), "FmRadio","Not able to tune!!!!");
+                            }
+                        }
+
+                   } else {
+                       // Code for non blocking call
+                      mStatus = sFmRadio.rxSetBand_nb(sBand);
+                      if (mStatus == false) {
+                           showAlert(getParent(), "FmRadio","Not able to setband!!!!");
+                          }
+                   }
+                }
                 break;
 
              /*
@@ -744,36 +768,7 @@ private void startup() {
                  * idle, so that user can set other volume.
                  */
                 mVolState = VOL_REQ_STATE_IDLE;
-                /*
-                 * Setting the default band after the volume change when FM app
-                 * is started for the first time
-                 */
-                if (sdefaultSettingOn == false) {
-                     /* Set the default band */
-                        if (MAKE_FM_APIS_BLOCKING == true) {
-                                 // Code for blocking call
-                               mStatus = sFmRadio.rxSetBand(sBand);
-                                if (mStatus == false) {
-                            showAlert(getParent(), "FmRadio","Not able to setband!!!!");
-                           } else {
-                                lastTunedFrequency = (float) lastTunedFrequency ;
-                                 mStatus = sFmRadio.rxTune_nb((int)(lastTunedFrequency.floatValue()* 1000));
-                            if (mStatus == false) {
-                                   showAlert(getParent(), "FmRadio","Not able to tune!!!!");
-                            }
-                        }
 
-                   } else {
-                       // Code for non blocking call
-                      mStatus = sFmRadio.rxSetBand_nb(sBand);
-                      if (mStatus == false) {
-                           showAlert(getParent(), "FmRadio","Not able to setband!!!!");
-                          }
-                   }
-
-
-
-                }
                 break;
 
                 case EVENT_COMPLETE_SCAN_PROGRESS:
@@ -1115,28 +1110,34 @@ private void startup() {
 
                 }
 
-            }
-
-            else
-                {
+            } else {
 
                     mStatus = sFmRadio.rxSetBand_nb(band);
-                            if (mStatus == false) {
-                    Log.e(TAG, "setRdsConfig()-- setBand ->Erorr");
-                    showAlert(this, "FmRadio",
-                            "Cannot  setBand to selected Value!!!!");
-                } else {
-                    sBand = band;
-                    if (sdefaultSettingOn == true) {
-                        /* Set the default frequency */
-                        if (sBand == FM_BAND_EUROPE_US)
-                            lastTunedFrequency = (float) DEFAULT_FREQ_EUROPE;
-                        else
-                            lastTunedFrequency = (float) DEFAULT_FREQ_JAPAN;
-                    }
 
+                    if (mStatus == false) {
+                        Log.e(TAG, "setRdsConfig()-- setBand ->Erorr");
+                        showAlert(this, "FmRadio",
+                           "Cannot  setBand to selected Value!!!!");
+                    } else {
+                        sBand = band;
+                        if (sdefaultSettingOn == true) {
+                            switch(sBand) {
+                                case FM_BAND_EUROPE_US:
+                                    lastTunedFrequency = (float) DEFAULT_FREQ_EUROPE;
+                                    break;
+                                case FM_BAND_JAPAN:
+                                    lastTunedFrequency = (float) DEFAULT_FREQ_JAPAN;
+                                    break;
+                                case FM_BAND_RUSSIAN:
+                                    lastTunedFrequency = (float) DEFAULT_FREQ_RUSSIAN;
+                                    break;
+                                case FM_BAND_WEATHER:
+                                    lastTunedFrequency = (float) DEFAULT_FREQ_WEATHER;
+                                    break;
+                        }
+                    }
                 }
-    }
+            }
 }
 
 
@@ -1346,6 +1347,23 @@ private void startup() {
           mIsDbPresent = false;
        }
 
+        sBand = fmConfigPreferences.getInt(BAND, DEFAULT_BAND);
+        switch(sBand) {
+                case FM_BAND_EUROPE_US:
+                    lastTunedFrequency = fmConfigPreferences.getFloat(FREQUENCY, DEFAULT_FREQ_EUROPE);
+                    break;
+                case FM_BAND_JAPAN:
+                    lastTunedFrequency = fmConfigPreferences.getFloat(FREQUENCY, DEFAULT_FREQ_JAPAN);
+                    break;
+                case FM_BAND_RUSSIAN:
+                    lastTunedFrequency = fmConfigPreferences.getFloat(FREQUENCY, DEFAULT_FREQ_RUSSIAN);
+                    break;
+                case FM_BAND_WEATHER:
+                    lastTunedFrequency = fmConfigPreferences.getFloat(FREQUENCY, DEFAULT_FREQ_WEATHER);
+                    break;
+        }
+
+        Log.d(TAG, "sBand = " +sBand);
        if (mIsDbPresent == false) {
 
           Log.d(TAG, " mIsDbPresent writeobject" + mIsDbPresent);
@@ -1357,10 +1375,6 @@ private void startup() {
        }
 
        Log.d(TAG, " mIsDbPresent " + mIsDbPresent);
-        sBand = fmConfigPreferences.getInt(BAND, DEFAULT_BAND);
-        lastTunedFrequency = fmConfigPreferences.getFloat(FREQUENCY,
-                (sBand == FM_BAND_EUROPE_US ? DEFAULT_FREQ_EUROPE
-                        : DEFAULT_FREQ_JAPAN));
         mMode = fmConfigPreferences.getInt(MODE, DEFAULT_MODE);
         mToggleMute = fmConfigPreferences.getBoolean(MUTE, false);
        mRdsState = fmConfigPreferences.getBoolean(RDS, false);
