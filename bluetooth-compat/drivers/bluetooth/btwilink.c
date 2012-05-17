@@ -24,6 +24,7 @@
  */
 #define DEBUG
 #include <linux/platform_device.h>
+#include <linux/module.h>
 #include <net/bluetooth/bluetooth.h>
 #include <net/bluetooth/hci_core.h>
 #include <net/bluetooth/hci.h>
