@@ -1,3 +1,5 @@
+ifeq ($(BOARD_HAVE_BLUETOOTH),true)
+
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -23,3 +25,5 @@ LOCAL_MODULE:=ant_enabler
 LOCAL_MODULE_TAGS:= eng
 
 include $(BUILD_EXECUTABLE)
+
+endif
