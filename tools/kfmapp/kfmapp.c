@@ -475,6 +475,7 @@ int fmapp_set_tx_frequency(char *cmd)
    }
 
    vf.tuner = 0;
+   vf.type = V4L2_TUNER_RADIO;
    vf.frequency = rint(user_freq * 16000 + 0.5);
 
    div = (vm.capability & V4L2_TUNER_CAP_LOW) ? 1000 : 1;
@@ -502,6 +503,7 @@ int fmapp_set_rx_frequency(char *cmd)
    sscanf(cmd, "%f", &user_freq);
 
    vf.tuner = 0;
+   vf.type = V4L2_TUNER_RADIO;
    /* As per V4L2 specifications VIDIOC_S_FREQUENCY ioctl expects tuning
     * frequency in units of 62.5 KHz, or if the struct v4l2_tuner or struct
     * v4l2_modulator capabilities flag V4L2_TUNER_CAP_LOW is set, in units
@@ -1174,6 +1176,7 @@ int fmapp_get_scan_valid_frequencies(void)
    for(freq=start_frq;freq<=end_frq;freq+=0.1)
    {
     vf.tuner = 0;
+    vf.type = V4L2_TUNER_RADIO;
     vf.frequency = rint(freq*1000);
     ret = ioctl(g_radio_fd, VIDIOC_S_FREQUENCY, &vf);    /* tune */
         if (ret < 0) {
