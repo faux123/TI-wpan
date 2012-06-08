@@ -5083,6 +5083,7 @@ public class StubFmService extends IFmRadio.Stub implements
                 mContext.sendBroadcast(intentDisable, FMRX_PERM);
             }
 
+        mIsCompleteScanInProgress = false;
     }
 
     public void fmRxCmdDestroy(JFmRx context, JFmRxStatus status, int command,

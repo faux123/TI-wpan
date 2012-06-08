@@ -17,6 +17,10 @@
 					android:layout_gravity="center" android:layout_height="wrap_content"
 					android:layout_width="fill_parent" android:layout_weight="1">
 				</ImageView>
+                                <ImageView android:id="@+id/imgCompScan"
+					android:layout_gravity="center" android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:layout_weight="1">
+				</ImageView>
 				<ImageView android:id="@+id/imgMode"
 					android:layout_height="wrap_content" android:layout_width="fill_parent"
 					android:layout_weight="1" android:layout_gravity="center">

@@ -112,7 +112,7 @@ public class FmRxApp extends Activity implements View.OnClickListener,
      * Widgets
      ********************************************/
 
-    private ImageView imgFmPower, imgFmMode, imgFmVolume, imgFmAudiopath;
+    private ImageView imgFmPower, imgFmMode, imgFmVolume, imgFmCompScan, imgFmAudiopath;
     private ImageButton imgFmSeekUp, imgFmSeekDown;
     private TextView txtStatusMsg, txtRadioText;
     private TextView txtPsText;
@@ -138,6 +138,9 @@ public class FmRxApp extends Activity implements View.OnClickListener,
     private int mToggleMode = 0; // To toggle between the mono/stereo
     private int mToggleAudio = 1; // To toggle between the speaker/headset
     private boolean mToggleMute = false; // To toggle between the mute/unmute
+    private boolean mToggleCompScan = false;
+    private boolean mCompScanStat = false;
+    private boolean mStoppedRds = false;
 
     private boolean mRdsState = false;
     /* Default values */
@@ -262,6 +265,7 @@ public class FmRxApp extends Activity implements View.OnClickListener,
         intentFilter.addAction(FmRadioIntent.GET_BAND_ACTION);
         intentFilter.addAction(FmRadioIntent.GET_MONO_STEREO_MODE_ACTION);
         intentFilter.addAction(FmRadioIntent.GET_MUTE_MODE_ACTION);
+        intentFilter.addAction(FmRadioIntent.GET_COMP_SCAN_ACTION);
         intentFilter.addAction(FmRadioIntent.GET_RF_MUTE_MODE_ACTION);
         intentFilter.addAction(FmRadioIntent.GET_RSSI_THRESHHOLD_ACTION);
         intentFilter.addAction(FmRadioIntent.GET_DEEMPHASIS_FILTER_ACTION);
@@ -959,6 +963,7 @@ private void startup() {
 
             case EVENT_COMPLETE_SCAN_STOP:
                 Log.i(TAG, "enter handleMessage ----EVENT_COMPLETE_SCAN_STOP");
+                    imgFmCompScan.setImageResource(R.drawable.fm_start_comp_scan);
                 break;
 
             case EVENT_COMPLETE_SCAN_DONE:
@@ -966,11 +971,25 @@ private void startup() {
 
                 int[] channelList = (int[]) msg.obj;
                 int noOfChannels = (int) msg.arg2;
+                float station;
 
-                Log.i(TAG, "noOfChannels" + noOfChannels);
+                Log.i(TAG, "noOfChannels " + noOfChannels);
 
-                for (int i = 0; i < noOfChannels; i++)
-                    Log.i(TAG, "channelList" + channelList[i]);
+                for (int i = 0; i < noOfChannels; i++) {
+                    Log.i(TAG, "channelList " + channelList[i]);
+                    if (i <= 5) {
+                        /* There are only 6 presets, neglect if found more */
+                        station = (float) channelList[i] / 1000;
+                        Log.i(TAG, "channelList (float)" + station);
+
+                        updateSetStation(i, String.valueOf(station), String.valueOf(station));
+                    }
+                }
+
+                mToggleCompScan = false;
+                mCompScanStat = true;
+
+                finishActivity(ACTIVITY_STOPCOMPSCAN);
 
                 break;
 
@@ -996,6 +1015,15 @@ private void startup() {
                 Long gMode = (Long) msg.obj;
                 Log.i(TAG,"enter handleMessage ----EVENT_GET_MODE");
                 Log.d(TAG, "enter handleMessage ----gMode" + gMode);
+                   break;
+            case EVENT_GET_COMP_SCAN :
+
+                Long gCompScan = (Long) msg.obj;
+
+                if(gCompScan ==(long) FM_START_COMP_SCAN)
+                    imgFmCompScan.setImageResource(R.drawable.fm_start_comp_scan);
+
+                Log.i(TAG,"enter handleMessage ----EVENT_GET_COMP_SCAN");
                    break;
             case EVENT_GET_MUTE_MODE :
 
@@ -1332,6 +1360,7 @@ private void startup() {
             saveObject();
 
        /* Read the stations stored in DB and update the UI */
+       if(mCompScanStat == false) {
        try {
           db.open();
           Cursor c = db.getStation(1);
@@ -1345,6 +1374,7 @@ private void startup() {
           mIsDbPresent = false;
        } catch (Exception ex) {
           mIsDbPresent = false;
+       }
        }
 
         sBand = fmConfigPreferences.getInt(BAND, DEFAULT_BAND);
@@ -1364,15 +1394,17 @@ private void startup() {
         }
 
         Log.d(TAG, "sBand = " +sBand);
-       if (mIsDbPresent == false) {
+        if(mCompScanStat == false) {
+                if (mIsDbPresent == false) {
 
-          Log.d(TAG, " mIsDbPresent writeobject" + mIsDbPresent);
-          writeObject();
-          mIsDbPresent = true;
-       } else {
-          Log.d(TAG, " mIsDbPresent readobject" + mIsDbPresent);
-          readObject();
-       }
+                        Log.d(TAG, " mIsDbPresent writeobject" + mIsDbPresent);
+                        writeObject();
+                        mIsDbPresent = true;
+                } else {
+                        Log.d(TAG, " mIsDbPresent readobject" + mIsDbPresent);
+                        readObject();
+                }
+        }
 
        Log.d(TAG, " mIsDbPresent " + mIsDbPresent);
         mMode = fmConfigPreferences.getInt(MODE, DEFAULT_MODE);
@@ -1382,7 +1414,6 @@ private void startup() {
        if (DBG)
           Log.d(TAG, " Load default band " + sBand + "default volume" + mVolume + "last fre"
                 + lastTunedFrequency + "mode" + mMode + "mToggleMute" + mToggleMute +"mRdsState"+mRdsState);
-
     }
 
     private void createEmptyList() {
@@ -1520,6 +1551,14 @@ private void startup() {
         }
 
 
+        imgFmCompScan = (ImageView) findViewById(R.id.imgCompScan);
+        imgFmCompScan.setOnClickListener(this);
+
+        if (mToggleCompScan == false) {
+        imgFmCompScan.setImageResource(R.drawable.fm_start_comp_scan);
+        Log.i(TAG, " initControls Complete Scan " +mToggleCompScan);
+        }
+
         imgFmSeekUp = (ImageButton) findViewById(R.id.imgseekup);
         imgFmSeekUp.setOnClickListener(this);
 
@@ -1612,6 +1651,16 @@ private void startup() {
             }
         }
             break;
+
+        case (ACTIVITY_STOPCOMPSCAN):
+                if(mToggleCompScan == false)
+                        break;
+
+                Log.i(TAG, "ACTIVITY_STOPCOMPSCAN");
+                sFmRadio.rxStopCompleteScan_nb();
+
+                txtStatusMsg.setText(R.string.playing);
+                break;
 
         case (ACTIVITY_CONFIG): {
             if (resultCode == Activity.RESULT_OK) {
@@ -1892,6 +1941,7 @@ private void startup() {
                     + sFmRadio.rxStopCompleteScan_nb());
                 }
 
+            txtStatusMsg.setText(R.string.playing);
             return true;
 
         case KeyEvent.KEYCODE_S:
@@ -2037,6 +2087,36 @@ if (MAKE_FM_APIS_BLOCKING == true) {
                 }
             }
 
+            break;
+        case R.id.press:
+            Log.i(TAG, "Testing completescan()");
+            showAlert(this, "FmRadio", "Stoping Complete Scan");
+            break;
+
+        case R.id.imgCompScan:
+            Log.i(TAG, "Starting completescan");
+
+            if(sBand == FM_BAND_WEATHER) {
+                    showAlert(this, "FmRadio", "Complete Scan is not available for Weather Band");
+                    break;
+            }
+
+            /* Start Second intent for complete scan */
+            Intent intent = new Intent();
+            intent.setClass(this,FmRxCompScan.class);
+            startActivityForResult(intent, ACTIVITY_STOPCOMPSCAN);
+
+            txtStationName.setText(null); /* set the station name to null */
+
+            mStatus = sFmRadio.rxCompleteScan_nb();
+            if (mStatus == false) {
+                    showAlert(this, "FmRadio", "Not able to do complete scan!!!!");
+
+            } else {
+                    txtStatusMsg.setText(R.string.scaning);
+
+                    mToggleCompScan = true;
+            }
             break;
         case R.id.station1:
             mStationIndex = 0;
@@ -2381,6 +2461,15 @@ if (MAKE_FM_APIS_BLOCKING == true) {
 
 
 
+                if (fmAction.equals(FmRadioIntent.GET_COMP_SCAN_ACTION)) {
+                    Log.i(TAG, "enter onReceive GET_COMP_SCAN_ACTION " + fmAction);
+
+                    Long gMuteMode = intent.getLongExtra(
+                            FmRadioIntent.GET_COMP_SCAN, 0);
+                    mHandler.sendMessage(mHandler.obtainMessage(
+                            EVENT_GET_COMP_SCAN, gMuteMode));
+                }
+
                         if (fmAction.equals(FmRadioIntent.GET_MUTE_MODE_ACTION)) {
                     Log.i(TAG, "enter onReceive GET_MUTE_MODE_ACTION " + fmAction);
 
@@ -2568,15 +2657,31 @@ if (MAKE_FM_APIS_BLOCKING == true) {
 
                 int status = extras.getInt(FmRadioIntent.STATUS, 0);
 
+                float station;
+
                 Log.i(TAG, "noOfChannels" + noOfChannels);
 
-                for (int i = 0; i < noOfChannels; i++)
-
+                for (int i = 0; i < noOfChannels; i++) {
                     Log.i(TAG, "channelList" + channelList[i]);
+                    if (i <= 5) {
+                        /* There are only 6 presets, neglect if found more */
+                        station = (float) channelList[i] / 1000;
+
+                        updateSetStation(i, String.valueOf(station), String.valueOf(station));
+                    }
+                }
+
+                txtStatusMsg.setText(R.string.playing);
+
+                imgFmCompScan.setImageResource(R.drawable.fm_start_comp_scan);
 
                 mHandler.sendMessage(mHandler.obtainMessage(
                         EVENT_COMPLETE_SCAN_DONE, status, noOfChannels,
                         channelList));
+
+                mToggleCompScan = false;
+                mCompScanStat = true;
+                finishActivity(ACTIVITY_STOPCOMPSCAN);
             }
 
             if (fmAction.equals(FmRadioIntent.COMPLETE_SCAN_STOP_ACTION)) {

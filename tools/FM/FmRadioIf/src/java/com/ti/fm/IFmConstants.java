@@ -87,6 +87,10 @@ public interface IFmConstants {
 
     public static final int FM_UNMUTE = 1;
 
+    public static final int FM_START_COMP_SCAN = 1;
+
+    public static final int FM_STOP_COMP_SCAN = 0;
+
     public static final int FM_ATT = 2;
 
     /* Fm Radio State */

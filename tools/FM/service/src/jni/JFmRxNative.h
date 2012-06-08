@@ -35,6 +35,7 @@ extern "C" {
 #define FM_BAND_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_band"
 #define FM_RDS_AF_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_rds_af"
 #define FM_RSSI_LVL_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_rssi_lvl"
+#define FMRX_COMP_SCAN_SYSFS_ENTRY    "/sys/class/video4linux/radio0/fmrx_comp_scan"
 
 #define CTL_INDEX_0                0
 

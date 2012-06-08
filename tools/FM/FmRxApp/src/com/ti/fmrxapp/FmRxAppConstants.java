@@ -60,6 +60,7 @@ public interface FmRxAppConstants {
     public static final int EVENT_GET_FREQUENCY = 37;
     public static final int EVENT_COMPLETE_SCAN_PROGRESS = 38;
     public static final int EVENT_SET_WRAP_SEEK = 39;
+    public static final int EVENT_GET_COMP_SCAN = 40;
 
 
     /* Volume range */
@@ -89,6 +90,7 @@ public interface FmRxAppConstants {
     public static final int ACTIVITY_TUNE = 1;
     public static final int ACTIVITY_CONFIG = 2;
     public static final int ACTIVITY_PRESET = 3;
+    public static final int ACTIVITY_STOPCOMPSCAN = 4;
 
     public static final String FREQ_VALUE = "FREQUENCY";
 

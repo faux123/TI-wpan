@@ -90,6 +90,9 @@
 	<string name="rdssystem">RDS System:</string>
 	<string name="number">Enter valid number</string>
 	<string name="seeking">Seeking ....</string>
+	<string name="scaning">Scaning ....</string>
+	<string name="CompScanRunning">Complete Scanning...</string>
+	<string name="CompScanStop">STOP</string>
 	<string name="playing">Playing ....</string>
 	<string name="pstxt"></string>
 	<string name="index">Index</string>
