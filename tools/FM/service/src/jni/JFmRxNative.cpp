@@ -566,6 +566,7 @@ static int nativeJFmRx_Tune(JNIEnv *env, jobject obj,jlong jContextValue,jint us
         }
 
     vf.tuner = 0;
+    vf.type = V4L2_TUNER_RADIO;
     vf.frequency = rint(user_freq * 16 + 0.5);
 
     div = (vt.capability & V4L2_TUNER_CAP_LOW) ? 1000 : 1;
