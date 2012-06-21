@@ -2848,6 +2848,11 @@ int mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
 		goto failed;
 	}
 
+	/* copy to hdev->name */
+        if (memcmp(name, hdev->dev_name, sizeof(hdev->dev_name)) != 0) {
+                memcpy(hdev->dev_name, name, sizeof(hdev->dev_name));
+        }
+
 	update_eir(hdev);
 
 	err = cmd_complete(cmd->sk, hdev->id, MGMT_OP_SET_LOCAL_NAME, &ev,
