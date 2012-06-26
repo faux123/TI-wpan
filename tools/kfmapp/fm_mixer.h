@@ -17,23 +17,23 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#define CAPTURE_PREAMPLIFIER_VOLUME    64
-#define CAPTURE_VOLUME                 65
-#define MUX_UL11                       54
-#define MUX_UL10                       55
-#define DL1_MIXER_MULTIMEDIA           51
+#define CAPTURE_PREAMPLIFIER_VOLUME    68
+#define CAPTURE_VOLUME                 69
+#define MUX_UL11                       58
+#define MUX_UL10                       59
+#define DL1_MIXER_MULTIMEDIA           55
 #define DL1_CAPTURE_PLAYBACK_VOLUME    9
-#define DL1_PDM_SWITCH                 34
-#define DL1_MIXER_CAPTURE              50
-#define AMIC_UL_VOLUME                 27
+#define DL1_PDM_SWITCH                 36
+#define DL1_MIXER_CAPTURE              54
+#define AMIC_UL_VOLUME                 29
 
 #ifdef ENABLE_OMAP5_FM
 /* OMAP5 mixer values */
-#define ANALOG_RIGHT_CAPTURE_ROUTE     81
-#define ANALOG_LEFT_CAPTURE_ROUTE      82
+#define ANALOG_RIGHT_CAPTURE_ROUTE     85
+#define ANALOG_LEFT_CAPTURE_ROUTE      86
 
-#define HEADSET_RIGHT_PLAYBACK         77
-#define HEADSET_LEFT_PLAYBACK          78
+#define HEADSET_RIGHT_PLAYBACK         81
+#define HEADSET_LEFT_PLAYBACK          82
 #else
 /* OMAP4 mixer values */
 #define ANALOG_RIGHT_CAPTURE_ROUTE     76
