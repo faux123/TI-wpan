@@ -30,8 +30,13 @@
 /*
  * Log a debug log mesage.
  */
+#ifdef DEBUG
 #define V4L2_JBTL_LOGD(...) LOGD( __VA_ARGS__)
 #define V4L2_JBTL_LOGD_IF(cond, ...) LOGD_IF(cond, __VA_ARGS__)
+#else
+#define V4L2_JBTL_LOGD(...)
+#define V4L2_JBTL_LOGD_IF(cond, ...)
+#endif
 
 /*
  * Log a informational log mesage.

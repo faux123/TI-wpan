@@ -1,7 +1,7 @@
 /*
  *  TI FM kernel driver's sample application.
  *
- *  Copyright (C) 2010 Texas Instruments
+ *  Copyright (C) 2012 Texas Instruments
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -31,6 +31,7 @@
 #include <poll.h>
 
 #include "kfmapp.h"
+#include "fm_mixer.h"
 
 static unsigned int pdevice = 0;                        /* playback device */
 static unsigned int cdevice = 1;                        /* capture device */
@@ -38,6 +39,11 @@ static int fm_aud_enable;
 struct pcm *pcm_p = NULL;
 struct pcm *pcm_c = NULL;
 struct mixer *mixer;
+
+#ifdef ENABLE_OMAP5_FM
+/* FM Rx digital on OMAP5 */
+static int fm_digital_enable;
+#endif
 
 /* #define V4L2_TUNER_SUB_RDS 0x10 */
 
@@ -55,6 +61,7 @@ static pthread_t g_rds_thread_ptr;
 volatile char g_rds_thread_terminate,g_rds_thread_running;
 
 static int g_radio_fd;
+static int g_wrap_around;
 
 /* Program Type */
 static char *pty_str[]= {"None", "News", "Current Affairs",
@@ -101,7 +108,7 @@ void fmapp_display_rx_menu(void)
    printf("- decreases the volume\n");
    printf("v <0-65535> sets the volume\n");
    printf("gv get volume\n");
-   printf("b<value> switches Japan / Eur-Us (0=US/Eur & 1=Japan)\n");
+   printf("b<value> Band switch(0=US/Eur, 1=Japan, 2=Russian and 3=Weather)\n");
    printf("gb get band\n");
    printf("s switches stereo / mono\n");
    printf("gs get stereo/mono mode\n");
@@ -115,13 +122,18 @@ void fmapp_display_rx_menu(void)
    printf("gz get rds system\n"); */
    printf("c<value> set rds af switch(0-OFF & 1=ON)\n");
    printf("gc get rds af switch\n");
+   printf("w Enable/Disable wrap around seek\n");
    printf("< seek down\n");
    printf("> seek up\n");
+   printf("C Complete Scan\n");
    printf("? <(0)-(127)> set RSSI threshold\n");
    printf("g? get rssi threshold\n");
    printf("ga get tuner attributes\n");
 /* printf("gn auto scan\n"); */
-   printf("A Start FM RX Audio Routing\n");
+   printf("A Start FM RX Analog Audio Routing\n");
+#ifdef ENABLE_OMAP5_FM
+   printf("D Start FM RX Digital Audio Routing\n");
+#endif
    printf("q quit rx menu\n");
 }
 int fmapp_get_tx_ant_imp(void)
@@ -226,7 +238,7 @@ int fmapp_get_rx_frequency(void)
 
    div = (vt.capability & V4L2_TUNER_CAP_LOW) ? 1000 : 1;
 
-   printf("Tuned to frequency %3.2f MHz \n",vf.frequency / ( 16.0 * div));
+   printf("Tuned to frequency %3.3f MHz \n",vf.frequency / ( 16.0 * div));
    return 0;
 }
 
@@ -319,7 +331,7 @@ int fmapp_set_tx_rds_radio_pi_code(char *cmd)
 
 int fmapp_set_tx_rds_radio_af(char *cmd)
 {
-    int fd, res, af_freq;
+    int fd, res;
 
     fd = open(FMTX_RDS_AF_SYSFS_ENTRY, O_RDWR);
     if (fd < 0) {
@@ -463,6 +475,7 @@ int fmapp_set_tx_frequency(char *cmd)
    }
 
    vf.tuner = 0;
+   vf.type = V4L2_TUNER_RADIO;
    vf.frequency = rint(user_freq * 16000 + 0.5);
 
    div = (vm.capability & V4L2_TUNER_CAP_LOW) ? 1000 : 1;
@@ -490,6 +503,7 @@ int fmapp_set_rx_frequency(char *cmd)
    sscanf(cmd, "%f", &user_freq);
 
    vf.tuner = 0;
+   vf.type = V4L2_TUNER_RADIO;
    /* As per V4L2 specifications VIDIOC_S_FREQUENCY ioctl expects tuning
     * frequency in units of 62.5 KHz, or if the struct v4l2_tuner or struct
     * v4l2_modulator capabilities flag V4L2_TUNER_CAP_LOW is set, in units
@@ -523,7 +537,7 @@ int fmapp_set_rx_frequency(char *cmd)
        printf("Failed to set frequency %f\n",user_freq);
        return res;
    }
-   printf("Tuned to frequency %3.2f MHz\n", vf.frequency / (16.0 * div));
+   printf("Tuned to frequency %3.3f MHz\n", vf.frequency / (16.0 * div));
    return 0;
 }
 
@@ -655,6 +669,17 @@ int fmapp_get_rx_mute_mode(void)
    printf("%s\n",g_mutemodes[vctrl.value]);
    return 0;
 }
+
+void fmapp_rx_wrap_around(void)
+{
+   if(g_wrap_around == 0)
+       g_wrap_around = 1;
+   else
+       g_wrap_around = 0;
+
+   printf("Wrap around seek: %s\n",g_wrap_around?"Enabled":"Disabled");
+}
+
 int fmapp_rx_seek(int seek_direction)
 {
    struct ti_v4l2_hw_freq_seek frq_seek;
@@ -664,7 +689,7 @@ int fmapp_rx_seek(int seek_direction)
    frq_seek.type = 1;
    frq_seek.seek_upward = seek_direction;
    frq_seek.spacing = 200000;
-   frq_seek.wrap_around = 0;
+   frq_seek.wrap_around = g_wrap_around;
    errno = 0;
    res = ioctl(g_radio_fd,VIDIOC_S_HW_FREQ_SEEK,&frq_seek);
    if(errno == EAGAIN)
@@ -679,6 +704,73 @@ int fmapp_rx_seek(int seek_direction)
    /* Display seeked freq */
    fmapp_get_rx_frequency();
    return 0;
+}
+
+int fmapp_rx_comp_scan(void)
+{
+    int fd, res, i, num_stations;
+    char cmd='1';
+    struct pollfd pfd;
+    unsigned char stations[410*4];
+
+    fd = open(FMRX_COMP_SCAN_SYSFS_ENTRY, O_RDWR);
+    if (fd < 0) {
+        printf("Can't open %s", FMRX_RDS_AF_SYSFS_ENTRY);
+        return -1;
+    }
+
+    res = write(fd, &cmd, sizeof(char));
+    if(res <= 0){
+        printf("Failed to Start Complete Scan\n");
+        goto exit;
+    }
+
+    printf("polling for data.");
+    while(1) {
+        printf(".");
+        memset(&pfd, 0, sizeof(pfd));
+        pfd.fd = g_radio_fd;
+        pfd.events = POLLIN;
+        res = poll(&pfd, 1, 10);
+        if (res == POLLIN){
+            /* Break the poll after Complete scan is done */
+            break;
+        }
+    }
+
+    printf("Poll end\n");
+
+    cmd = '2';
+    res = write(fd, &cmd, sizeof(char));
+    if(res < 0){
+        printf("Failed to read Complete Scan results\n");
+        goto exit;
+    }
+
+    num_stations = res;
+    printf("Found %d stations\n",num_stations);
+
+    memset(&stations, 0, 410*4);
+
+    res = read(g_radio_fd, &stations, res*4);
+    if(res < 0){
+        printf("reading %s failed %s\n",
+                FMRX_RDS_AF_SYSFS_ENTRY,strerror(res));
+        goto exit;
+    }
+
+    printf("res = %d\n",res);
+
+    for(i=0; i<4*num_stations; i=i+4) {
+        res = ((stations[i+3] << 24) + (stations[i+2] << 16) + (stations[i+1] << 8) + (stations[i]));
+        printf("Station[%d] = %d\n",((i/4 + 1)),res);
+    }
+
+    printf("FM Complete Scan finished\n");
+
+exit:
+    close(fd);
+    return res;
 }
 
 int fmapp_set_rx_af_switch(char *cmd)
@@ -794,7 +886,22 @@ int fmapp_set_band(char *cmd)
         goto exit;
     }
 
-    printf("FM Band is set to %s\n", atoi(cmd) == 0?"US/EUROPE":"JAPAN");
+    printf("FM Band is set to: ");
+    switch (atoi(cmd)) {
+        case 0:
+            printf("JAPAN\n");
+            break;
+        case 1:
+            printf("US/EUROPE\n");
+            break;
+        case 2:
+            printf("RUSSIAN\n");
+            break;
+        case 3:
+            printf("WEATHER\n");
+            break;
+    }
+
 exit:
     close(fd);
     return res;
@@ -862,18 +969,28 @@ int fmapp_start_audio()
 
    if (fm_aud_enable == 0){
        /* Set Tinymix controles */
-       tinymix_set_value(mixer, 77, 2);
-       tinymix_set_value(mixer, 76, 2);
-       tinymix_set_value(mixer, 64, 1);
-       tinymix_set_value(mixer, 65, 4);
-       tinymix_set_value(mixer, 55, 12);
-       tinymix_set_value(mixer, 54, 11);
-       tinymix_set_value(mixer, 51, 1);
-       tinymix_set_value(mixer, 9, 120);
-       tinymix_set_value(mixer, 72, 1);
-       tinymix_set_value(mixer, 73, 1);
-       tinymix_set_value(mixer, 34, 1);
-       tinymix_set_value(mixer, 50, 1);
+       tinymix_set_value(mixer, CAPTURE_PREAMPLIFIER_VOLUME, 1);
+       tinymix_set_value(mixer, CAPTURE_VOLUME, 4);
+#ifdef ENABLE_OMAP5_FM
+       if(fm_digital_enable == 1) {
+       /* FM RX Digital path */
+       tinymix_set_value(mixer, MUX_UL10, MMEXT_LEFT);
+       tinymix_set_value(mixer, MUX_UL11, MMEXT_RIGHT);
+       tinymix_set_value(mixer, AMIC_UL_VOLUME, OFF);
+       }
+       else {
+       /* FM RX Analog path */
+       tinymix_set_value(mixer, ANALOG_RIGHT_CAPTURE_ROUTE, AUX_FM_RIGHT);
+       tinymix_set_value(mixer, ANALOG_LEFT_CAPTURE_ROUTE, AUX_FM_LEFT);
+       tinymix_set_value(mixer, MUX_UL10, AMIC1);
+       tinymix_set_value(mixer, MUX_UL11, AMIC0);
+       }
+#endif
+       tinymix_set_value(mixer, DL1_MIXER_MULTIMEDIA, ON);
+       tinymix_set_value(mixer, HEADSET_RIGHT_PLAYBACK, ON);
+       tinymix_set_value(mixer, HEADSET_LEFT_PLAYBACK, ON);
+       tinymix_set_value(mixer, DL1_PDM_SWITCH, ON);
+       tinymix_set_value(mixer, DL1_MIXER_CAPTURE, ON);
 
        pcm_p = pcm_open(0, pdevice, PCM_OUT, &config);
        if (!pcm_p || !pcm_is_ready(pcm_p)) {
@@ -881,33 +998,44 @@ int fmapp_start_audio()
                    pcm_get_error(pcm_p));
            return 0;
        }
-       printf("Playback device opened successfully");
+       printf("Playback device opened successfully\n");
        pcm_c = pcm_open(0, cdevice, PCM_IN, &config);
        if (!pcm_c || !pcm_is_ready(pcm_c)) {
            fprintf(stderr, "Unable to open PCM device (%s)\n",
                    pcm_get_error(pcm_c));
            return 0;
        }
-       printf("Capture device opened successfully");
+       printf("Capture device opened successfully\n");
+
+       tinymix_set_value(mixer, DL1_CAPTURE_PLAYBACK_VOLUME, 120);
+
        pcm_start(pcm_c);
        pcm_start(pcm_p);
-       printf(" Trigered the loopback");
+       printf("Trigered the loopback\n");
        fm_aud_enable = 1;
    }
    else {
        /* Set Tinymix controls to Normal*/
-       tinymix_set_value(mixer, 77, 0);
-       tinymix_set_value(mixer, 76, 0);
-       tinymix_set_value(mixer, 64, 0);
-       tinymix_set_value(mixer, 65, 0);
-       tinymix_set_value(mixer, 55, 0);
-       tinymix_set_value(mixer, 54, 0);
-       tinymix_set_value(mixer, 51, 0);
-       tinymix_set_value(mixer, 9, 0);
-       tinymix_set_value(mixer, 72, 0);
-       tinymix_set_value(mixer, 73, 0);
-       tinymix_set_value(mixer, 34, 0);
-       tinymix_set_value(mixer, 50, 0);
+       tinymix_set_value(mixer, ANALOG_RIGHT_CAPTURE_ROUTE, OFF);
+       tinymix_set_value(mixer, ANALOG_LEFT_CAPTURE_ROUTE, OFF);
+       tinymix_set_value(mixer, CAPTURE_PREAMPLIFIER_VOLUME, OFF);
+       tinymix_set_value(mixer, CAPTURE_VOLUME, OFF);
+       tinymix_set_value(mixer, MUX_UL10, OFF);
+       tinymix_set_value(mixer, MUX_UL11, OFF);
+       tinymix_set_value(mixer, DL1_MIXER_MULTIMEDIA, OFF);
+       tinymix_set_value(mixer, DL1_CAPTURE_PLAYBACK_VOLUME, OFF);
+       tinymix_set_value(mixer, HEADSET_RIGHT_PLAYBACK, OFF);
+       tinymix_set_value(mixer, HEADSET_LEFT_PLAYBACK, OFF);
+       tinymix_set_value(mixer, DL1_PDM_SWITCH, OFF);
+       tinymix_set_value(mixer, DL1_MIXER_CAPTURE, OFF);
+
+#ifdef ENABLE_OMAP5_FM
+       /* Set Tinymix controls to Normal */
+       if (fm_digital_enable)
+         tinymix_set_value(mixer, AMIC_UL_VOLUME, 120);
+
+       fm_digital_enable = 0;
+#endif
 
        /* close the device */
        pcm_stop(pcm_p);
@@ -1049,6 +1177,7 @@ int fmapp_get_scan_valid_frequencies(void)
    for(freq=start_frq;freq<=end_frq;freq+=0.1)
    {
     vf.tuner = 0;
+    vf.type = V4L2_TUNER_RADIO;
     vf.frequency = rint(freq*1000);
     ret = ioctl(g_radio_fd, VIDIOC_S_FREQUENCY, &vf);    /* tune */
         if (ret < 0) {
@@ -1347,6 +1476,12 @@ void fmapp_execute_rx_other_command(char *cmd)
      case '>':
           fmapp_rx_seek(FM_SEARCH_DIRECTION_UP);
       break;
+     case 'C':
+          fmapp_rx_comp_scan();
+      break;
+    case 'w':
+          fmapp_rx_wrap_around();
+      break;
      case 'b':
           fmapp_set_band(cmd+1);
           break;
@@ -1374,6 +1509,10 @@ void fmapp_execute_rx_other_command(char *cmd)
      case 'e':
           fmapp_set_rx_deemphasis_filter_mode(fm_snd_ctrl);
           break;
+#endif
+#ifdef ENABLE_OMAP5_FM
+     case 'D':
+         fm_digital_enable =1;
 #endif
      case 'A':
       fmapp_start_audio();
