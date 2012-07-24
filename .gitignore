@@ -13,6 +13,10 @@
 *.o
 *.o.*
 *.out
+*.ko
+*.mod.c
+*.order
+*.symvers
 
 #
 # Top-level generic files
