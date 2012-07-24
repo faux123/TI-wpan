@@ -14,7 +14,7 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#define pr_fmt(fmt)		KBUILD_MODNAME ": " fmt
+//#define pr_fmt(fmt)		KBUILD_MODNAME ": " fmt
 
 #include <linux/module.h>
 #include <linux/crc8.h>
