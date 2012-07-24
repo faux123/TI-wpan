@@ -5,7 +5,9 @@ KMODPATH_ARG:=  "INSTALL_MOD_PATH=$(KLIB)"
 else
 export KLIB:=          /lib/modules/$(shell uname -r)
 endif
-export KLIB_BUILD ?=	$(KLIB)/build
+#export KLIB_BUILD ?=	$(KLIB)/build
+export KLIB_BUILD = ~/kernel/HTC_Amaze_Kernel/
+
 # Sometimes not available in the path
 MODPROBE := /sbin/modprobe
 MADWIFI=$(shell $(MODPROBE) -l ath_pci)
